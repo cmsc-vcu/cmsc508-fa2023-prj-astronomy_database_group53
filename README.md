@@ -18,6 +18,10 @@ Included are the following:
 
 ## Resources
 
+Astronomy Engine repository:
+
+* https://github.com/cosinekitty/astronomy
+
 Pitch video - deliverable 3:
 
 * https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch
