@@ -8,20 +8,21 @@ format:
         theme: cyborg
         toc: false
         embed-resources: true
+        linkcolor: pink
 ---
 
 
 
-# 🪐Project Overview🪐
+#### 🪐Project Overview🪐 
 
 
 See:
 
-* GITHUB REPO:
+* [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53/tree/main):
 
 
 
-# Problem Description
+#### Problem Description
 
 Problem domain
 : provide summary of the problem domain, providing context, scope of the area. For example, one might talk about the building murals in Richmond, and provide a bit of history (or pictures), so that someone understands the problem domain.
@@ -38,7 +39,7 @@ User roles and use cases
 Security and Privacy
 :  Discuss any security and privacy concerns that need to be addressed in the design. Consider user authentication, data encryption, and access controls.
 
-# Database Design
+#### Database Design
 
 Entity-relationship diagram (ERD)
 : Created using proper software tools and consistent notation. Note: your design should consist of at least 4 major entities. You can use Chen notation, Crow’s foot notation, or both; one to show the high-level, logical architecture, and the second to show the more granular data. There will be more than one way to design your database to meet the needs of the problem statement. I’m looking for a discussion of why you make the design choices that you did. Were there any tradeoffs? Did you have to sacrifice one thing for another?
