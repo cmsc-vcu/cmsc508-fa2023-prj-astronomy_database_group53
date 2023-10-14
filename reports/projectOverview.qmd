@@ -18,7 +18,7 @@ format:
 
 See:
 
-* [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53/tree/main):
+* [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53)
 
 
 
@@ -57,8 +57,3 @@ Note: distinct queries are those that are entirely different. Counterexample: "D
 
 Sample Data
 : Sample data for each relation your design documented above. I’m looking for 5-10 tuples in each relation, to clearly communicate the domains of each attribute. I suggest that you use chatgpt to help create the tables.  NOTE - results from chatgpt are formatted in markdown, so if you ask chatgpt to produce a table of values with specific columns, you can cut/paste this directly into quarto and get a pretty table!
-
-
-
-
-
