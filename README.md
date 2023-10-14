@@ -1,6 +1,6 @@
 # Astronomy Database Project
 
-This repository include documentation and source code for an astronomy database. This database holds information on celestial bodies, celestial events, and astronomers who discovered both. Using the Astronomy Engine libarary, we plan to also include information on future instances and locations of celestial events and bodies.
+This repository includes documentation and source code for an astronomy database. This database holds information on celestial bodies, celestial events, and astronomers who discovered both. Using the Astronomy Engine libarary, we plan to also include information on future instances and locations of celestial events and bodies.
 
 Included are the following files:
 
