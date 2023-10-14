@@ -1,6 +1,6 @@
 ---
 title-block-banner: cropped.jpg
-title: Astronomy Database Project Overview 
+title: Astronomy Database 
 date: October 9, 2023
 authors: 🌟 Uma Manicka & Celeste Olmstead 🌟
 format:
