@@ -19,7 +19,8 @@ format:
 See:
 
 * [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53)
-
+* [PITCH VIDEO](https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch)
+* [DESIGN VIDEO]()
 
 
 #### Problem Description
@@ -42,7 +43,24 @@ Security and Privacy
 #### Database Design
 
 Entity-relationship diagram (ERD)
-: Created using proper software tools and consistent notation. Note: your design should consist of at least 4 major entities. You can use Chen notation, Crow’s foot notation, or both; one to show the high-level, logical architecture, and the second to show the more granular data. There will be more than one way to design your database to meet the needs of the problem statement. I’m looking for a discussion of why you make the design choices that you did. Were there any tradeoffs? Did you have to sacrifice one thing for another?
+: One design tradeoff we've had to make during this design process is removing an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would've added much more complexity to our database. So, we decided to remove this functionality.
+
+We also were thinking of having the user input their location, and, in return, they'd receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.
+
+Below is a low-level design of the database:
+```{mermaid}
+---
+title: Astronomy Database
+---
+erDiagram
+    CELESTIAL-OBJECT }o--o{ EVENT : causes
+    DISCOVERER }|--|{ CELESTIAL-OBJECT : discovers
+    DISCOVERER }|--|{ EVENT : discovers
+    CELESTIAL-OBJECT }|--|{ LOCATION : has
+    EVENT }|--|{ LOCATION : has
+```
+
+Our idea is that celestial objects can cause events, although events don't always have to be directly caused by a celestial object, or may have a cause we are unsure of. Many objects can cause an event, but some do not. Both events and ojects have locations that they can be seen from on Earth. Events and objects can be seen sometimes only in certain hemispheres or regions (like Aurora Borealis). This allows the user to query the database with questions like: what location has the most meteor showers? This requires splitting the Earth into certain zones, so, when coordinates are inputted, they are classified into a certain zone.
 
 Relational schemas
 : Listing of relations, their attributes, types, domain, and constraints, identification of the primary key and foreign keys and other constraints.
@@ -57,3 +75,28 @@ Note: distinct queries are those that are entirely different. Counterexample: "D
 
 Sample Data
 : Sample data for each relation your design documented above. I’m looking for 5-10 tuples in each relation, to clearly communicate the domains of each attribute. I suggest that you use chatgpt to help create the tables.  NOTE - results from chatgpt are formatted in markdown, so if you ask chatgpt to produce a table of values with specific columns, you can cut/paste this directly into quarto and get a pretty table!
+
+
+#### Project Management
+
+``` {mermaid}
+%%{init: {'theme':'dark'}}%%
+gantt
+    title Semester Project Timeline
+    dateFormat YYYY-MM-DD
+    Deliverable 4 Due : milestone, m1, 2023-10-15, 0d
+    Deliverable 5 Due : milestone, m1, 2023-11-03, 0d
+    Deliverable 6 Due : milestone, m1, 2023-11-17, 0d
+    Semester Project Due : milestone, m1, 2023-12-12, 0d
+    section Tasks
+        Database Development:a1, 2023-10-15, 12d
+        Status Report    :a2, 2023-10-27, 7d
+        API Development  :after a2, 14d
+        Status Report    :a3, 2023-11-10, 7d
+        Finishing Touches:a4, 2023-11-27, 15d
+        Final Report     :a5, 2023-12-5, 7d
+```
+
+In this chart, there are milestones of when the project deliverables are due and a loose timeline of what we'll work on and when. We'll use the status report deliverables as goals for finishing certain aspects of development. 
+
+A lot of the development is based on when we cover topics in class. Generally, during database development, we'll set up the database and implement queries. Then, during API development, we'll develop a client program to interact with the database.
