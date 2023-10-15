@@ -2809,13 +2809,13 @@ z-index: 1000;
 <dl>
 <dt>Problem domain</dt>
 <dd>
-provide summary of the problem domain, providing context, scope of the area. For example, one might talk about the building murals in Richmond, and provide a bit of history (or pictures), so that someone understands the problem domain.
+provide a summary of the problem domain, providing context, scope of the area. For example, one might talk about the building murals in Richmond, and provide a bit of history (or pictures), so that someone understands the problem domain.
 </dd>
 <dt>Need</dt>
 <dd>
-provide a summary on why a database is needed, and what problem it might help solve. Why does this database need to be developed?
+provide a summary of why a database is needed and what problem it might help solve. Why does this database need to be developed?
 </dd>
-<dt>Context, scope and perspective</dt>
+<dt>Context, scope, and perspective</dt>
 <dd>
 Who is the DB for, or what perspective will the DB represent? In the domain of sports teams, is the database for the coach, team owner, player, or fan?
 </dd>
@@ -2831,25 +2831,23 @@ Discuss any security and privacy concerns that need to be addressed in the desig
 </section>
 <section id="database-design" class="level4">
 <h4 class="anchored" data-anchor-id="database-design">Database Design</h4>
-<dl>
-<dt>Entity-relationship diagram (ERD)</dt>
-<dd>
-One design tradeoff we’ve had to make during this design process is removing an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would’ve added much more complexity to our database. So, we decided to remove this functionality.
-</dd>
-</dl>
-<p>We also were thinking of having the user input their location, and, in return, they’d receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.</p>
-<p>Below is a low-level design of the database:</p>
+<p><strong>Entity-relationship diagram (ERD)</strong></p>
+<p>Design Tradeoffs</p>
+<ul>
+<li><p>We removed an idea for an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would’ve added much more complexity to our database. So, we decided to remove this functionality.</p></li>
+<li><p>We also were thinking of having the user input their location, and, in return, they’d receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.</p></li>
+</ul>
+<p>Below is an abstract design of the database:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">---
-title: Astronomy Database
----
+</p><pre class="mermaid mermaid-js" data-tooltip-selector="#mermaid-tooltip-1">%%{init: {&#39;theme&#39;:&#39;dark&#39;}}%%
 erDiagram
     CELESTIAL-OBJECT }o--o{ EVENT : causes
-    DISCOVERER }|--|{ CELESTIAL-OBJECT : discovers
-    DISCOVERER }|--|{ EVENT : discovers
+    CELESTIAL-OBJECT }o--o{ CELESTIAL-OBJECT : linked_to
+    OBSERVER }|--|{ CELESTIAL-OBJECT : observes
+    OBSERVER }|--|{ EVENT : observes
     CELESTIAL-OBJECT }|--|{ LOCATION : has
     EVENT }|--|{ LOCATION : has
 </pre>
@@ -2860,13 +2858,214 @@ erDiagram
 </div>
 </div>
 </div>
-<p>Our idea is that celestial objects can cause events, although events don’t always have to be directly caused by a celestial object, or may have a cause we are unsure of. Many objects can cause an event, but some do not. Both events and ojects have locations that they can be seen from on Earth. Events and objects can be seen sometimes only in certain hemispheres or regions (like Aurora Borealis). This allows the user to query the database with questions like: what location has the most meteor showers? This requires splitting the Earth into certain zones, so, when coordinates are inputted, they are classified into a certain zone.</p>
+<p>Celestial Objects and Events</p>
+<ul>
+<li>Our idea is that celestial objects can cause events, although events don’t always have to be directly caused by a celestial object or may have a cause we are unsure of. Many objects can cause an event, but some do not.</li>
+</ul>
+<p>Location</p>
+<ul>
+<li>Both events and ojects have locations that they can be seen from Earth. Events and objects can be seen sometimes only in certain hemispheres or regions (like Aurora Borealis). This allows the user to query the database with questions like: What location has the most meteor showers? This requires splitting the Earth into certain zones, so, when coordinates are inputted, they are classified into a certain zone.</li>
+</ul>
+<p>Observers</p>
+<ul>
+<li>We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.</li>
+</ul>
 <dl>
-<dt>Relational schemas</dt>
+<dt><strong>Relational schemas</strong></dt>
 <dd>
-Listing of relations, their attributes, types, domain, and constraints, identification of the primary key and foreign keys and other constraints.
+Below is a list of relations, shown as tables with sample data:
 </dd>
-<dt>Functional Dependencies and Normalization</dt>
+</dl>
+<p><strong>CelestialObject</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 13%">
+<col style="width: 10%">
+<col style="width: 9%">
+<col style="width: 14%">
+<col style="width: 8%">
+<col style="width: 34%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>object_id</th>
+<th>object_name</th>
+<th>object_type</th>
+<th>RA</th>
+<th>Dec</th>
+<th>magnitude</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>andromeda galaxy</td>
+<td>galaxy</td>
+<td>00h 42m 44s</td>
+<td>+41° 16’ 09”</td>
+<td>3.44</td>
+<td>Spiral galaxy visible to the naked eye.</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>orion nebula</td>
+<td>nebula</td>
+<td>05h 35m 17s</td>
+<td>-05° 23’ 28”</td>
+<td>4.00</td>
+<td>Emission nebula in the Orion constellation.</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>jupiter</td>
+<td>planet</td>
+<td>20h 22m 38s</td>
+<td>-18° 40’ 48”</td>
+<td>-2.94</td>
+<td>The largest planet in our solar system.</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>pleiades</td>
+<td>star cluster</td>
+<td>03h 47m 24s</td>
+<td>+24° 07’ 00”</td>
+<td>1.60</td>
+<td>Open star cluster in Taurus constellation.</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>horsehead nebula</td>
+<td>nebula</td>
+<td>05h 41m 02s</td>
+<td>-02° 27’ 30”</td>
+<td>6.80</td>
+<td>Dark nebula in the constellation Orion.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Event</strong></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>event_id</th>
+<th>event_name</th>
+<th>date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>eclipse</td>
+<td>2023-10-20</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>meteor shower</td>
+<td>2023-11-15</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>comet sighting</td>
+<td>2024-03-05</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>supernova observation</td>
+<td>2024-06-12</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>planetary conjunction</td>
+<td>2024-08-30</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observer</strong></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>observer_id</th>
+<th>first_name</th>
+<th>last_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Astronomer</td>
+<td>One</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Astronomer</td>
+<td>Two</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Astronomer</td>
+<td>Three</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Astronomer</td>
+<td>Four</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Astronomer</td>
+<td>Five</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Location</strong></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>location_id</th>
+<th>hemisphere</th>
+<th>latitude</th>
+<th>longitude</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Northern</td>
+<td>40.7128</td>
+<td>-74.0060</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Southern</td>
+<td>34.0522</td>
+<td>-118.2437</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Northern</td>
+<td>51.5074</td>
+<td>-0.1278</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Southern</td>
+<td>33.4484</td>
+<td>-112.0740</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Northern</td>
+<td>41.8781</td>
+<td>-87.6298</td>
+</tr>
+</tbody>
+</table>
+<p>Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.</p>
+<dl>
+<dt><strong>Functional Dependencies and Normalization</strong></dt>
 <dd>
 A discussion of the functional dependencies in the proposed database schema, and a demonstration of the normalization of the relations to BCNF/4NF. This might consist of a description, in a text format, of the process of decomposing the tables extracted from the ERD translation into relations satisfying BCNF/4NF. Note that your decomposition via BCNF/4NF must be lossless.
 </dd>
