@@ -2846,10 +2846,11 @@ Discuss any security and privacy concerns that need to be addressed in the desig
 erDiagram
     CELESTIAL-OBJECT }o--o{ EVENT : causes
     CELESTIAL-OBJECT }o--o{ CELESTIAL-OBJECT : linked_to
-    OBSERVER }|--|{ CELESTIAL-OBJECT : observes
-    OBSERVER }|--|{ EVENT : observes
-    CELESTIAL-OBJECT }|--|{ LOCATION : has
-    EVENT }|--|{ LOCATION : has
+    OBSERVER }|--|{ CELESTIAL-OBJECT : discovers
+    OBSERVER }|--|{ EVENT : discovers
+    CELESTIAL-OBJECT }|--|{ LOCATION : viewed_from
+    CELESTIAL-OBJECT }|--|{ CELESTIALLOCATION : has
+    EVENT }|--|{ LOCATION : viewed_from
 </pre>
 <div id="mermaid-tooltip-1" class="mermaidTooltip">
 
@@ -2879,22 +2880,16 @@ Below is a list of relations, shown as tables with sample data:
 <p><strong>CelestialObject</strong></p>
 <table class="table">
 <colgroup>
-<col style="width: 8%">
-<col style="width: 13%">
-<col style="width: 10%">
-<col style="width: 9%">
-<col style="width: 14%">
-<col style="width: 8%">
-<col style="width: 34%">
+<col style="width: 12%">
+<col style="width: 20%">
+<col style="width: 16%">
+<col style="width: 50%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>object_id</th>
 <th>object_name</th>
 <th>object_type</th>
-<th>RA</th>
-<th>Dec</th>
-<th>magnitude</th>
 <th>description</th>
 </tr>
 </thead>
@@ -2903,45 +2898,30 @@ Below is a list of relations, shown as tables with sample data:
 <td>1</td>
 <td>andromeda galaxy</td>
 <td>galaxy</td>
-<td>00h 42m 44s</td>
-<td>+41° 16’ 09”</td>
-<td>3.44</td>
 <td>Spiral galaxy visible to the naked eye.</td>
 </tr>
 <tr class="even">
 <td>2</td>
 <td>orion nebula</td>
 <td>nebula</td>
-<td>05h 35m 17s</td>
-<td>-05° 23’ 28”</td>
-<td>4.00</td>
 <td>Emission nebula in the Orion constellation.</td>
 </tr>
 <tr class="odd">
 <td>3</td>
 <td>jupiter</td>
 <td>planet</td>
-<td>20h 22m 38s</td>
-<td>-18° 40’ 48”</td>
-<td>-2.94</td>
 <td>The largest planet in our solar system.</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>pleiades</td>
 <td>star cluster</td>
-<td>03h 47m 24s</td>
-<td>+24° 07’ 00”</td>
-<td>1.60</td>
 <td>Open star cluster in Taurus constellation.</td>
 </tr>
 <tr class="odd">
 <td>5</td>
 <td>horsehead nebula</td>
 <td>nebula</td>
-<td>05h 41m 02s</td>
-<td>-02° 27’ 30”</td>
-<td>6.80</td>
 <td>Dark nebula in the constellation Orion.</td>
 </tr>
 </tbody>
@@ -3020,7 +3000,7 @@ Below is a list of relations, shown as tables with sample data:
 </tr>
 </tbody>
 </table>
-<p><strong>Location</strong></p>
+<p><strong>EarthLocation</strong></p>
 <table class="table">
 <thead>
 <tr class="header">
@@ -3028,6 +3008,7 @@ Below is a list of relations, shown as tables with sample data:
 <th>hemisphere</th>
 <th>latitude</th>
 <th>longitude</th>
+<th>UTC</th>
 </tr>
 </thead>
 <tbody>
@@ -3036,34 +3017,86 @@ Below is a list of relations, shown as tables with sample data:
 <td>Northern</td>
 <td>40.7128</td>
 <td>-74.0060</td>
+<td>UTC-4</td>
 </tr>
 <tr class="even">
 <td>2</td>
 <td>Southern</td>
 <td>34.0522</td>
 <td>-118.2437</td>
+<td>UTC-7</td>
 </tr>
 <tr class="odd">
 <td>3</td>
 <td>Northern</td>
 <td>51.5074</td>
 <td>-0.1278</td>
+<td>UTC+0</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>Southern</td>
 <td>33.4484</td>
 <td>-112.0740</td>
+<td>UTC-7</td>
 </tr>
 <tr class="odd">
 <td>5</td>
 <td>Northern</td>
 <td>41.8781</td>
 <td>-87.6298</td>
+<td>UTC-5</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CelestialLocation</strong></p>
+<table class="table">
+<thead>
+<tr class="header">
+<th>cel_location_id</th>
+<th>RA</th>
+<th>Dec</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>00h 42m 44s</td>
+<td>+41° 16’ 09”</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>05h 35m 17s</td>
+<td>-05° 23’ 28”</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>20h 22m 38s</td>
+<td>-18° 40’ 48”</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>03h 47m 24s</td>
+<td>+24° 07’ 00”</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>05h 41m 02s</td>
+<td>-02° 27’ 30”</td>
 </tr>
 </tbody>
 </table>
 <p>Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.</p>
+<p>Below is a list of relationships:</p>
+<ul>
+<li><p><strong>CelestialObject-Event</strong>: containing an id, the event_id, the object_id, and the date. One event_id can be related to multiple object_id’s, but does not need to be related to any.</p></li>
+<li><p><strong>Event-Location</strong>: containing an id, the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.</p></li>
+<li><p><strong>CelestialObject-Location</strong>: containing an id, the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.</p></li>
+<li><p><strong>CelestialObject-CelestialLocation</strong>: containing an id, cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.</p></li>
+<li><p><strong>Observer-Event</strong>: contains an id, the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.</p></li>
+<li><p><strong>Observer-CelestialObject</strong>: contains an id, the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.</p></li>
+<li><p><strong>CelestialObject-CelestialObject</strong>: contains an id and 2 object_id’s. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.</p></li>
+</ul>
 <dl>
 <dt><strong>Functional Dependencies and Normalization</strong></dt>
 <dd>
@@ -3075,12 +3108,6 @@ Given the context, scope, and perspective, the team should pose 20 distinct ques
 </dd>
 </dl>
 <p>Note: distinct queries are those that are entirely different. Counterexample: “Display a list of student last names in alphabetical order” is not distinct from “Display a list of student names and email addresses”. However, “Display a list of student last names in alphabetical order” is distinct from “Who are the five students with the highest GPA?”</p>
-<dl>
-<dt>Sample Data</dt>
-<dd>
-Sample data for each relation your design documented above. I’m looking for 5-10 tuples in each relation, to clearly communicate the domains of each attribute. I suggest that you use chatgpt to help create the tables. NOTE - results from chatgpt are formatted in markdown, so if you ask chatgpt to produce a table of values with specific columns, you can cut/paste this directly into quarto and get a pretty table!
-</dd>
-</dl>
 </section>
 <section id="project-management" class="level4">
 <h4 class="anchored" data-anchor-id="project-management">Project Management</h4>
