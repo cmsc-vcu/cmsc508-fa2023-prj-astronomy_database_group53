@@ -50,6 +50,8 @@ Design Tradeoffs
 
 * We also were thinking of having the user input their location, and, in return, they'd receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.
 
+* One more design consideration is how to handle Location and time. Currently, there are two different tables for celestial coordinates and longitude and latitude coordinates. There's also Altitude and Azimuth coordinates, which, given two set of longitude and latitude and the time, or celestial coordinates and the time, you're able to get the angle and direction you'd have to look to see a celestial body/event. It's a bit of a complex calculation, and we're unsure if performance would be better having a query calculate it or creating another table.
+
 Below is an abstract design of the database:
 ```{mermaid}
 %%{init: {'theme':'dark'}}%%
@@ -95,13 +97,14 @@ Observers
 
 **Event**
 
-| event_id | event_name      | date       |
-|----------|-----------------|------------|
-| 1        | eclipse         | 2023-10-20 |
-| 2        | meteor shower   | 2023-11-15 |
-| 3        | comet sighting  | 2024-03-05 |
-| 4        | supernova observation | 2024-06-12 |
-| 5        | planetary conjunction | 2024-08-30 |
+| event_id | event_name    | date       | duration  | frequency   |
+|----------|---------------|------------|-----------|-------------|
+| 1        | eclipse       | 2023-10-20 | 2 hours   | 1/year      |
+| 2        | meteor shower | 2023-11-15 | 6 hours   | 2/month     |
+| 3        | comet sighting | 2024-03-05 | 1 day     | 3/week      |
+| 4        | supernova observation | 2024-06-12 | 4 days   | 4/year      |
+| 5        | planetary conjunction | 2024-08-30 | 0.5 days | 5/decade    |
+
 
 
 **Observer**
@@ -117,13 +120,14 @@ Observers
 
 **EarthLocation**
 
-| location_id | hemisphere | latitude  | longitude  | UTC    |
-|------------|------------|-----------|------------|------- |
-| 1          | Northern    | 40.7128   | -74.0060   | UTC-4  |
-| 2          | Southern    | 34.0522   | -118.2437  | UTC-7  |
-| 3          | Northern    | 51.5074   | -0.1278    | UTC+0  |
-| 4          | Southern    | 33.4484   | -112.0740  | UTC-7  |
-| 5          | Northern    | 41.8781   | -87.6298   | UTC-5  |
+| location_id | hemisphere | latitude  | longitude  | timezone | local_time  |
+|------------|------------|-----------|------------|----------|------------|
+| 1          | Northern    | 40.7128   | -74.0060   | UTC-4    | 16:00:00 |
+| 2          | Southern    | 34.0522   | -118.2437  | UTC-7    | 13:00:00 |
+| 3          | Northern    | 51.5074   | -0.1278    | UTC+0    | 20:00:00 |
+| 4          | Southern    | 33.4484   | -112.0740  | UTC-7    | 13:00:00 |
+| 5          | Northern    | 41.8781   | -87.6298   | UTC-5    | 15:00:00 |
+
 
 
 **CelestialLocation**
@@ -142,25 +146,49 @@ Hopefully, using Astronomy Engine, we will be able to turn any location given in
 
 Below is a list of relationships:
 
-* **CelestialObject-Event**: containing an id, the event_id, the object_id, and the date. One event_id can be related to multiple object_id's, but does not need to be related to any.
+* **CelestialObject-Event**: containing the event_id, the object_id, and the date. One event_id can be related to multiple object_id's, but does not need to be related to any.
 
-* **Event-Location**: containing an id, the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.
+* **Event-Location**: containing the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.
 
-* **CelestialObject-Location**: containing an id, the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.
+* **CelestialObject-Location**: containing the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.
 
-* **CelestialObject-CelestialLocation**: containing an id, cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.
+* **CelestialObject-CelestialLocation**: containing the cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.
 
-* **Observer-Event**: contains an id, the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.
+* **Observer-Event**: contains the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.
 
-* **Observer-CelestialObject**: contains an id, the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.
+* **Observer-CelestialObject**: contains the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.
 
-* **CelestialObject-CelestialObject**: contains an id and 2 object_id's. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.
+* **CelestialObject-CelestialObject**: contains 2 object_id's. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.
 
 
 **Functional Dependencies and Normalization**
 : A discussion of the functional dependencies in the proposed database schema, and a demonstration of the  normalization of the relations to BCNF/4NF. This might consist of a description, in a text format, of the process of decomposing the tables extracted from the ERD translation into relations satisfying BCNF/4NF. Note that your decomposition via BCNF/4NF must be lossless.
 
-Specific queries
+**$R_{0}$**, CelestialObject, has functional dependency
+
+* object_id $\rightarrow$ object_name, object_type, description
+
+**$R_{1}$**, Event, has functional dependencies
+
+* event_id $\rightarrow$ event_name, date, duration, frequency
+* event_name $\rightarrow$ duration, frequency
+
+**$R_{3}$**, Observer, has functional dependency
+
+* observer_id $\rightarrow$ first_name, last_name
+
+**$R_{4}$**, EarthLocation, has functional dependencies
+
+* location_id $\rightarrow$ hemisphere, longitude, latitude, timezone, local_time
+* longiude, latitude $\rightarrow$ hemisphere, timezone
+
+**$R_{4}$**, CelestialLocation, has functional dependency
+
+* cel_location_id $\rightarrow$ RA, Dec
+
+
+
+**Specific queries**
 : Given the context, scope, and perspective, the team should pose 20 distinct questions that the database can help answer. These can be general queries of use to all the users, or specific queries for different users or user roles. These questions should be written in precise words and using relational algebra. Leverage Quarto to write the formulas! 10 each
 
 Note: distinct queries are those that are entirely different. Counterexample: "Display a list of student last names in alphabetical order" is not distinct from "Display a list of student names and email addresses". However, "Display a list of student last names in alphabetical order" is distinct from "Who are the five students with the highest GPA?”
