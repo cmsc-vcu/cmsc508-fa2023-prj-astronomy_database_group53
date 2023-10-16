@@ -29,7 +29,7 @@ See:
 
 : Astronomy, a captivating blend of science and human curiosity, explores the vast expanse of celestial objects, the mysteries of space, and the entirety of our physical universe. This field of study has a rich and storied history that dates back to the earliest civilizations, reflecting our innate desire to comprehend the world that surrounds us.
 
-: In the 3rd century BCE, Greek astronomers like Galileo Galilei introduced groundbreaking methods that substantiated the heliocentric model, reshaping our understanding of the universe. However, the realm of the stars has also played a role in astrology, an ancient practice that linked the positions of celestial bodies to human affairs. It was only in the early 10th and late 11th centuries that a clear distinction between astronomy and astrology emerged. While astrology no longer holds a place within the scientific community, it persists as a cultural and spiritual influence in societies worldwide.
+: In the 3rd century BCE, Greek astronomers like Galileo Galilei introduced groundbreaking methods that substantiated the heliocentric model, reshaping our understanding of the universe. 
 
 
 <span style="color:#a074c1;">Need</span>
@@ -38,35 +38,32 @@ See:
 
 <span style="color:#a074c1;">Context, Scope, and Perspective</span>
 
-: This database could be helpful for more than just avid astronomers. For them, we want to give information about where stars, planets, and constellations can be seen in telescopes. For more casual fans, we want to include information about events that can be seen with the naked eye - blue moons, eclipses, meteor showers, etc. Giving information on the history of these events and when they’re next predicted to happen could be useful for anyone who likes to stargaze.
+: This database could be helpful for more than just avid astronomers. For them, we want to give information about where stars, planets, and constellations can be seen in telescopes. For more casual fans, we want to include information about events that can be seen with the naked eye - blue moons, eclipses, meteor showers, etc. Giving information on when and where they’re next predicted to happen could be useful for anyone who likes to stargaze.
 
 <span style="color:#a074c1;">User roles and Use Cases</span>
+
 : Amateur Astronomers and Stargazers:
 
 * Usage: They use the database to plan a stargazing session, locate celestial objects, and gain insights into upcoming astronomical events.
 
-* Use Case: Users can input their location and date to find information on celestial events, visible planets, stars, and constellations in the night sky. The database provides real-time information to plan stargazing sessions.
-
-Astrology enthusiasts
-
-* Usage: Astrology enthusiasts can use the database to access astrological data, planetary positions, and celestial events relevant to astrology. The database can provide the astrological significance of astronomical events.
-
-* Use Case: "What significance does mercury's position in the sky have to my life?"
-
-History enthusiasts
-
-* Usage: Information on discoveries and scientists connected to different celestial bodies and events.
-
-* Use Case: Want to know about the first mention of a lunar eclipse? Find out about Zhou-shu, a book from the Zhou Dynasty.
+* Use Case: Users can input a location to find information on upcoming celestial events, visible planets, stars, and constellations in the night sky. The database provides real-time information to plan stargazing sessions.
 
 <span style="color:#a074c1;">Security and Privacy</span>
-:  Discuss any security and privacy concerns that need to be addressed in the design. Consider user authentication, data encryption, and access controls.
+
+: Access Controls
+* Unauthorized users should not be able to access or manipulate the database.
+
+: Data Encryption
+* Data transmitted over the network, especially sensitive user information such as a user's query (in case it has their location), should not be accessible by other users.
+
+: User Authentication
+* We do not plan on having a user authentication as our database will not store user's data or information. It will be purely for querying.
 
 #### Database Design
 
 **Entity-relationship diagram (ERD)**
 
-Design Tradeoffs
+<span style="color:#a074c1;">Design Tradeoffs</span>
 
 * We removed an idea for an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would've added much more complexity to our database. So, we decided to remove this functionality.
 
@@ -101,7 +98,7 @@ Observers
 * We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.
 
 
-**Relational schemas**
+<span style="color:#a074c1;">**Relational schemas**</span>
 : Below is a list of relations, shown as tables with sample data:
 
 **CelestialObject**
@@ -178,16 +175,67 @@ Below is a list of relationships:
 
 * **CelestialObject-CelestialObject**: contains an id and 2 object_id's. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.
 
+<span style="color:#a074c1;">**BCNF**</span>
 
-**Functional Dependencies and Normalization**
-: A discussion of the functional dependencies in the proposed database schema, and a demonstration of the  normalization of the relations to BCNF/4NF. This might consist of a description, in a text format, of the process of decomposing the tables extracted from the ERD translation into relations satisfying BCNF/4NF. Note that your decomposition via BCNF/4NF must be lossless.
+1. **CelestialObject-Event**:
+   - Candidate Key: `{object_id, event_id}`
+   - Functional Dependency: `object_id, event_id → date`
 
-Specific queries
-: Given the context, scope, and perspective, the team should pose 20 distinct questions that the database can help answer. These can be general queries of use to all the users, or specific queries for different users or user roles. These questions should be written in precise words and using relational algebra. Leverage Quarto to write the formulas! 10 each
+2. **Event-Location**:
+   - Candidate Key: `{event_id, location_id}`
+   - Functional Dependency: `event_id, location_id → date`
 
-Note: distinct queries are those that are entirely different. Counterexample: "Display a list of student last names in alphabetical order" is not distinct from "Display a list of student names and email addresses". However, "Display a list of student last names in alphabetical order" is distinct from "Who are the five students with the highest GPA?”
+3. **CelestialObject-Location**:
+   - Candidate Key: `{object_id, location_id}`
+   - Functional Dependency: `object_id, location_id → date`
+
+4. **CelestialObject-CelestialLocation**:
+   - Candidate Key: `{object_id, cel_location_id}`
+   - Functional Dependency: `object_id, cel_location_id → date`
+
+5. **Observer-Event**:
+   - Candidate Key: `{observer_id, event_id}`
+   - Functional Dependency: `observer_id, event_id → date`
+
+6. **Observer-CelestialObject**:
+   - Candidate Key: `{observer_id, object_id}`
+   - Functional Dependency: `observer_id, object_id → date`
+
+7. **CelestialObject-CelestialObject**:
+   - Candidate Key: `{object_id, related_object_id}`
+   - Functional Dependency: `object_id, related_object_id+
+
+All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.
 
 
+<span style="color:#a074c1;">**Queries**</span>
+
+:::{.column-body-outset}
+
+| Query | Description | Relational Algebra Expression |
+| ----- | ----------- | ---------------------------- |
+| 1. | Retrieve names and descriptions of celestial objects visible from a specific location. | $\pi_{object\_name, description}(\sigma_{location\_id = X}(CelestialObject-Location))$ |
+| 2. | Find upcoming celestial events for a given location. | $\pi_{event\_name, date}(\sigma_{location\_id = X}(Event-Location))$ |
+| 3. | Identify celestial objects discovered by a specific observer. | $\pi_{object\_name}(\sigma_{observer\_id = X}(Observer-CelestialObject))$ |
+| 4. | List all celestial events related to a specific celestial object. | $\pi_{event\_name}(\sigma_{object\_id = X}(CelestialObject-Event))$ |
+| 5. | Find the celestial objects with specific characteristics (e.g., galaxies, stars). | $\pi_{object\_name}(\sigma_{object\_type = "Galaxy" \land X)}(CelestialObject)$ |
+| 6. | Retrieve the celestial objects observed from a given hemisphere. | $\pi_{object\_name}(\sigma_{hemisphere = "Northern"}(EarthLocation \Join CelestialObject-Location \Join CelestialObject))$ |
+| 7. | Find events on a specific date. | $\pi_{event\_name}(\sigma_{date = "YYYY-MM-DD"}(Event))$ |
+| 8. | Get details about celestial locations. | $\pi_{RA, Dec}(\sigma_{cel\_location\_id = X}(CelestialLocation))$ |
+| 9. | List celestial objects linked to other celestial objects. | $\pi_{object\_name}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$ |
+| 10. | Find the observers who discovered a specific celestial object. | $\pi_{first\_name, last\_name}(\sigma_{object\_id = X}(Observer-CelestialObject))$ |
+| 11. | Plan a stargazing session by retrieving the celestial objects visible from a specific location and their altitudes. | $\pi_{object\_name, altitude}(\sigma_{location\_id = X}(CelestialObject-Location \Join CelestialLocation))$ |
+| 12. | Identify the best time to observe a particular celestial event, considering the location's time zone (UTC). | $\pi_{event\_name, date}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))$ |
+| 13. | Explore details about the celestial objects discovered by a specific observer, including their descriptions. | $\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-CelestialObject \Join CelestialObject))$ |
+| 14. | Find information about upcoming meteor showers, specifically where and when they can be observed. | $\pi_{event\_name, date}(\sigma_{event\_name = "Meteor Shower"}(Event-Location))$ |
+| 15. | Locate celestial objects of a particular type (e.g., planets) visible from a specific hemisphere. | $\pi_{object\_name}(\sigma_{object\_type = "Planet" \land hemisphere = "Northern"}(CelestialObject \Join CelestialObject-Location \Join EarthLocation))$ |
+| 16. | Discover the celestial events scheduled for a specific date and their locations. | $\pi_{event\_name, location\_id}(\sigma_{date = "YYYY-MM-DD"}(Event-Location))$ |
+| 17. | Determine the celestial objects with the highest altitudes at a given time. | $\pi_{object\_name, altitude}(\sigma_{date = "YYYY-MM-DD"}(CelestialObject-Location \Join CelestialLocation))$ |
+| 18. | Explore details about a specific celestial location, such as RA and Dec. | $\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join CelestialObject-Location \Join CelestialLocation))$ |
+|19. | Find celestial events with unique characteristics (e.g., total solar eclipses) and their dates. | $\pi_{event\_name, date}(\sigma_{event\_name = "Total Solar Eclipse"}(Event-Location))$ |
+| 20. | Discover celestial objects with unusual relationships (e.g., moons of specific planets). | $\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$ |
+
+:::
 #### Project Management
 
 ``` {mermaid}
@@ -200,14 +248,13 @@ gantt
     Deliverable 6 Due : milestone, m1, 2023-11-17, 0d
     Semester Project Due : milestone, m1, 2023-12-12, 0d
     section Tasks
-        Database Development:a1, 2023-10-15, 12d
-        Status Report    :a2, 2023-10-27, 7d
-        API Development  :after a2, 14d
-        Status Report    :a3, 2023-11-10, 7d
-        Finishing Touches:a4, 2023-11-27, 15d
-        Final Report     :a5, 2023-12-5, 7d
+        Database Development :a1, 2023-10-15, 12d
+        Status Report :a2, 2023-10-27, 7d
+        API Development :after a2, 14d
+        Status Report :a3, 2023-11-10, 7d
+        Finishing Touches :a4, 2023-11-27, 15d
+        Final Report :2023-12-05, 7d
+
+        
 ```
 
-In this chart, there are milestones of when the project deliverables are due and a loose timeline of what we'll work on and when. We'll use the status report deliverables as goals for finishing certain aspects of development. 
-
-A lot of the development is based on when we cover topics in class. Generally, during database development, we'll set up the database and implement queries. Then, during API development, we'll develop a client program to interact with the database.
