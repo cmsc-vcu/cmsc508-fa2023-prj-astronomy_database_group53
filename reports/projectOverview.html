@@ -2755,6 +2755,16 @@ z-index: 1000;
 }
 </style>
 
+  
+  <script>
+    (function () {
+      var script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src  = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js";
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })();
+  </script>
+
 
 </head>
 
@@ -2801,41 +2811,56 @@ z-index: 1000;
 <ul>
 <li><a href="https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53">GITHUB REPO</a></li>
 <li><a href="https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&amp;utm_medium=social&amp;utm_campaign=watch">PITCH VIDEO</a></li>
-<li><a href>DESIGN VIDEO</a></li>
+<li><a href="https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j">DESIGN VIDEO</a></li>
 </ul>
 </section>
 <section id="problem-description" class="level4">
 <h4 class="anchored" data-anchor-id="problem-description">Problem Description</h4>
 <dl>
-<dt>Problem domain</dt>
+<dt><span style="color:#a074c1;">Problem Domain</span></dt>
 <dd>
-provide a summary of the problem domain, providing context, scope of the area. For example, one might talk about the building murals in Richmond, and provide a bit of history (or pictures), so that someone understands the problem domain.
+<p>Astronomy, a captivating blend of science and human curiosity, explores the vast expanse of celestial objects, the mysteries of space, and the entirety of our physical universe. This field of study has a rich and storied history that dates back to the earliest civilizations, reflecting our innate desire to comprehend the world that surrounds us.</p>
 </dd>
-<dt>Need</dt>
 <dd>
-provide a summary of why a database is needed and what problem it might help solve. Why does this database need to be developed?
+<p>In the 3rd century BCE, Greek astronomers like Galileo Galilei introduced groundbreaking methods that substantiated the heliocentric model, reshaping our understanding of the universe.</p>
 </dd>
-<dt>Context, scope, and perspective</dt>
+<dt><span style="color:#a074c1;">Need</span></dt>
 <dd>
-Who is the DB for, or what perspective will the DB represent? In the domain of sports teams, is the database for the coach, team owner, player, or fan?
+<p>Everything in the sky is constantly moving, and, for those who are interested in astronomy, a tool to look up locations of celestial objects would be useful. Centralizing lots of the information already available into a user-friendly database could make astronomy more accessible, and hobbies which connect you to your surroundings as well as build community are great for your mental health.</p>
 </dd>
-<dt>User roles and use cases</dt>
+<dt><span style="color:#a074c1;">Context, Scope, and Perspective</span></dt>
 <dd>
-Identify the different user roles that will interact with the database. Describe their needs and how they will use the database. How will the database be used? Who will be using it? How will they be using it? How will the database be connected to other things?
+<p>This database could be helpful for more than just avid astronomers. For them, we want to give information about where stars, planets, and constellations can be seen in telescopes. For more casual fans, we want to include information about events that can be seen with the naked eye - blue moons, eclipses, meteor showers, etc. Giving information on when and where they’re next predicted to happen could be useful for anyone who likes to stargaze.</p>
 </dd>
-<dt>Security and Privacy</dt>
+<dt><span style="color:#a074c1;">User roles and Use Cases</span></dt>
 <dd>
-Discuss any security and privacy concerns that need to be addressed in the design. Consider user authentication, data encryption, and access controls.
+<p>Amateur Astronomers and Stargazers:</p>
+</dd>
+</dl>
+<ul>
+<li><p>Usage: They use the database to plan a stargazing session, locate celestial objects, and gain insights into upcoming astronomical events.</p></li>
+<li><p>Use Case: Users can input a location to find information on upcoming celestial events, visible planets, stars, and constellations in the night sky. The database provides real-time information to plan stargazing sessions.</p></li>
+</ul>
+<dl>
+<dt><span style="color:#a074c1;">Security and Privacy</span></dt>
+<dd>
+<p>Access Controls * Unauthorized users should not be able to access or manipulate the database.</p>
+</dd>
+<dd>
+<p>Data Encryption * Data transmitted over the network, especially sensitive user information such as a user’s query (in case it has their location), should not be accessible by other users.</p>
+</dd>
+<dd>
+<p>User Authentication * We do not plan on having a user authentication as our database will not store user’s data or information. It will be purely for querying.</p>
 </dd>
 </dl>
 </section>
 <section id="database-design" class="level4">
 <h4 class="anchored" data-anchor-id="database-design">Database Design</h4>
-<p><strong>Entity-relationship diagram (ERD)</strong></p>
-<p>Design Tradeoffs</p>
+<p><span style="color:#a074c1;">Design Tradeoffs</span></p>
 <ul>
 <li><p>We removed an idea for an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would’ve added much more complexity to our database. So, we decided to remove this functionality.</p></li>
 <li><p>We also were thinking of having the user input their location, and, in return, they’d receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.</p></li>
+<li><p>One more design consideration is how to handle Location and time. Currently, there are two different tables for celestial coordinates and longitude and latitude coordinates. There’s also Altitude and Azimuth coordinates, which, given two set of longitude and latitude and the time, or celestial coordinates and the time, you’re able to get the angle and direction you’d have to look to see a celestial body/event. It’s a bit of a complex calculation, and we’re unsure if performance would be better having a query calculate it or creating another table.</p></li>
 </ul>
 <p>Below is an abstract design of the database:</p>
 <div class="cell">
@@ -2872,7 +2897,7 @@ erDiagram
 <li>We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.</li>
 </ul>
 <dl>
-<dt><strong>Relational schemas</strong></dt>
+<dt><span style="color:#a074c1;"><strong>Relational schemas</strong></span></dt>
 <dd>
 Below is a list of relations, shown as tables with sample data:
 </dd>
@@ -2928,11 +2953,20 @@ Below is a list of relations, shown as tables with sample data:
 </table>
 <p><strong>Event</strong></p>
 <table class="table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 24%">
+<col style="width: 19%">
+<col style="width: 18%">
+<col style="width: 21%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>event_id</th>
 <th>event_name</th>
 <th>date</th>
+<th>duration</th>
+<th>frequency</th>
 </tr>
 </thead>
 <tbody>
@@ -2940,26 +2974,36 @@ Below is a list of relations, shown as tables with sample data:
 <td>1</td>
 <td>eclipse</td>
 <td>2023-10-20</td>
+<td>2 hours</td>
+<td>1/year</td>
 </tr>
 <tr class="even">
 <td>2</td>
 <td>meteor shower</td>
 <td>2023-11-15</td>
+<td>6 hours</td>
+<td>2/month</td>
 </tr>
 <tr class="odd">
 <td>3</td>
 <td>comet sighting</td>
 <td>2024-03-05</td>
+<td>1 day</td>
+<td>3/week</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>supernova observation</td>
 <td>2024-06-12</td>
+<td>4 days</td>
+<td>4/year</td>
 </tr>
 <tr class="odd">
 <td>5</td>
 <td>planetary conjunction</td>
 <td>2024-08-30</td>
+<td>0.5 days</td>
+<td>5/decade</td>
 </tr>
 </tbody>
 </table>
@@ -3002,50 +3046,64 @@ Below is a list of relations, shown as tables with sample data:
 </table>
 <p><strong>EarthLocation</strong></p>
 <table class="table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 16%">
+<col style="width: 13%">
+<col style="width: 25%">
+</colgroup>
 <thead>
 <tr class="header">
 <th>location_id</th>
-<th>hemisphere</th>
+<th>quadrant</th>
 <th>latitude</th>
 <th>longitude</th>
-<th>UTC</th>
+<th>timezone</th>
+<th>local_time</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>Northern</td>
+<td>NW</td>
 <td>40.7128</td>
 <td>-74.0060</td>
 <td>UTC-4</td>
+<td>2023-10-15 16:00:00</td>
 </tr>
 <tr class="even">
 <td>2</td>
-<td>Southern</td>
+<td>SW</td>
 <td>34.0522</td>
 <td>-118.2437</td>
 <td>UTC-7</td>
+<td>2023-10-15 13:00:00</td>
 </tr>
 <tr class="odd">
 <td>3</td>
-<td>Northern</td>
+<td>NE</td>
 <td>51.5074</td>
 <td>-0.1278</td>
 <td>UTC+0</td>
+<td>2023-10-15 20:00:00</td>
 </tr>
 <tr class="even">
 <td>4</td>
-<td>Southern</td>
+<td>SE</td>
 <td>33.4484</td>
 <td>-112.0740</td>
 <td>UTC-7</td>
+<td>2023-10-15 13:00:00</td>
 </tr>
 <tr class="odd">
 <td>5</td>
-<td>Northern</td>
+<td>NW</td>
 <td>41.8781</td>
 <td>-87.6298</td>
 <td>UTC-5</td>
+<td>2023-10-15 15:00:00</td>
 </tr>
 </tbody>
 </table>
@@ -3089,25 +3147,158 @@ Below is a list of relations, shown as tables with sample data:
 <p>Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.</p>
 <p>Below is a list of relationships:</p>
 <ul>
-<li><p><strong>CelestialObject-Event</strong>: containing an id, the event_id, the object_id, and the date. One event_id can be related to multiple object_id’s, but does not need to be related to any.</p></li>
-<li><p><strong>Event-Location</strong>: containing an id, the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.</p></li>
-<li><p><strong>CelestialObject-Location</strong>: containing an id, the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.</p></li>
-<li><p><strong>CelestialObject-CelestialLocation</strong>: containing an id, cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.</p></li>
-<li><p><strong>Observer-Event</strong>: contains an id, the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.</p></li>
-<li><p><strong>Observer-CelestialObject</strong>: contains an id, the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.</p></li>
-<li><p><strong>CelestialObject-CelestialObject</strong>: contains an id and 2 object_id’s. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.</p></li>
+<li><p><strong>CelestialObject-Event</strong>: containing the event_id, the object_id, and the date. One event_id can be related to multiple object_id’s, but does not need to be related to any.</p></li>
+<li><p><strong>Event-Location</strong>: containing the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.</p></li>
+<li><p><strong>CelestialObject-Location</strong>: containing the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.</p></li>
+<li><p><strong>CelestialObject-CelestialLocation</strong>: containing the cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.</p></li>
+<li><p><strong>Observer-Event</strong>: contains the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.</p></li>
+<li><p><strong>Observer-CelestialObject</strong>: contains the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.</p></li>
+<li><p><strong>CelestialObject-CelestialObject</strong>: contains 2 object_id’s. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.</p></li>
 </ul>
-<dl>
-<dt><strong>Functional Dependencies and Normalization</strong></dt>
-<dd>
-A discussion of the functional dependencies in the proposed database schema, and a demonstration of the normalization of the relations to BCNF/4NF. This might consist of a description, in a text format, of the process of decomposing the tables extracted from the ERD translation into relations satisfying BCNF/4NF. Note that your decomposition via BCNF/4NF must be lossless.
-</dd>
-<dt>Specific queries</dt>
-<dd>
-Given the context, scope, and perspective, the team should pose 20 distinct questions that the database can help answer. These can be general queries of use to all the users, or specific queries for different users or user roles. These questions should be written in precise words and using relational algebra. Leverage Quarto to write the formulas! 10 each
-</dd>
-</dl>
-<p>Note: distinct queries are those that are entirely different. Counterexample: “Display a list of student last names in alphabetical order” is not distinct from “Display a list of student names and email addresses”. However, “Display a list of student last names in alphabetical order” is distinct from “Who are the five students with the highest GPA?”</p>
+<p><span style="color:#a074c1;"><strong>BCNF</strong></span></p>
+<p><strong><span class="math inline">\(R_{0}\)</span></strong>, CelestialObject, has functional dependency</p>
+<ul>
+<li>object_id <span class="math inline">\(\rightarrow\)</span> object_name, object_type, description</li>
+</ul>
+<p><strong><span class="math inline">\(R_{1}\)</span></strong>, Event, has functional dependencies</p>
+<ul>
+<li>event_id <span class="math inline">\(\rightarrow\)</span> event_name, date, duration, frequency</li>
+<li>event_name <span class="math inline">\(\rightarrow\)</span> duration, frequency</li>
+</ul>
+<p><strong><span class="math inline">\(R_{3}\)</span></strong>, Observer, has functional dependency</p>
+<ul>
+<li>observer_id <span class="math inline">\(\rightarrow\)</span> first_name, last_name</li>
+</ul>
+<p><strong><span class="math inline">\(R_{4}\)</span></strong>, EarthLocation, has functional dependencies</p>
+<ul>
+<li>location_id <span class="math inline">\(\rightarrow\)</span> quadrant, longitude, latitude, timezone, local_time</li>
+<li>longiude, latitude <span class="math inline">\(\rightarrow\)</span> quadrant, timezone</li>
+</ul>
+<p><strong><span class="math inline">\(R_{4}\)</span></strong>, CelestialLocation, has functional dependency</p>
+<ul>
+<li>cel_location_id <span class="math inline">\(\rightarrow\)</span> RA, Dec</li>
+</ul>
+<ol type="1">
+<li><strong>CelestialObject-Event</strong>:
+<ul>
+<li>Candidate Key: <code>{object_id, event_id}</code></li>
+<li>Functional Dependency: <code>object_id, event_id → date</code></li>
+</ul></li>
+<li><strong>Event-Location</strong>:
+<ul>
+<li>Candidate Key: <code>{event_id, location_id}</code></li>
+<li>Functional Dependency: <code>event_id, location_id → date</code></li>
+</ul></li>
+<li><strong>CelestialObject-Location</strong>:
+<ul>
+<li>Candidate Key: <code>{object_id, location_id}</code></li>
+<li>Functional Dependency: <code>object_id, location_id → date</code></li>
+</ul></li>
+<li><strong>CelestialObject-CelestialLocation</strong>:
+<ul>
+<li>Candidate Key: <code>{object_id, cel_location_id}</code></li>
+<li>Functional Dependency: <code>object_id, cel_location_id → date</code></li>
+</ul></li>
+<li><strong>Observer-Event</strong>:
+<ul>
+<li>Candidate Key: <code>{observer_id, event_id}</code></li>
+<li>Functional Dependency: <code>observer_id, event_id → date</code></li>
+</ul></li>
+<li><strong>Observer-CelestialObject</strong>:
+<ul>
+<li>Candidate Key: <code>{observer_id, object_id}</code></li>
+<li>Functional Dependency: <code>observer_id, object_id → date</code></li>
+</ul></li>
+<li><strong>CelestialObject-CelestialObject</strong>:
+<ul>
+<li>Candidate Key: <code>{object_id, related_object_id}</code></li>
+<li>Functional Dependency: `object_id, related_object_id+</li>
+</ul></li>
+</ol>
+<p>All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.</p>
+<p><span style="color:#a074c1;"><strong>Queries</strong></span></p>
+<ol type="1">
+<li><p><strong>Retrieve names and descriptions of celestial objects visible from a specific location.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name, description}(\sigma_{location\_id = X}(CelestialObject-Location))\)</span></li>
+</ul></li>
+<li><p><strong>Find upcoming celestial events for a given location.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{location\_id = X}(Event-Location))\)</span></li>
+</ul></li>
+<li><p><strong>Identify celestial objects discovered by a specific observer.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name}(\sigma_{observer\_id = X}(Observer-CelestialObject))\)</span></li>
+</ul></li>
+<li><p><strong>List all celestial events related to a specific celestial object.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name}(\sigma_{object\_id = X}(CelestialObject-Event))\)</span></li>
+</ul></li>
+<li><p><strong>Find the celestial objects with specific characteristics (e.g., galaxies, stars).</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name}(\sigma_{object\_type = &quot;Galaxy&quot; \land X)}(CelestialObject)\)</span></li>
+</ul></li>
+<li><p><strong>Retrieve the celestial objects observed from a given quadrant.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name}(\sigma_{quadrant = &quot;NW&quot;}(EarthLocation \Join CelestialObject-Location \Join CelestialObject))\)</span></li>
+</ul></li>
+<li><p><strong>Find events on a specific date.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(Event))\)</span></li>
+</ul></li>
+<li><p><strong>Get details about celestial locations.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{RA, Dec}(\sigma_{cel\_location\_id = X}(CelestialLocation))\)</span></li>
+</ul></li>
+<li><p><strong>List celestial objects linked to other celestial objects.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))\)</span></li>
+</ul></li>
+<li><p><strong>Find the observers who discovered a specific celestial object.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{first\_name, last_name}(\sigma_{object\_id = X}(Observer-CelestialObject))\)</span></li>
+</ul></li>
+<li><p><strong>Plan a stargazing session by retrieving the celestial objects visible from a specific location and their altitudes.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name, altitude}(\sigma_{location\_id = X}(CelestialObject-Location \Join CelestialLocation))\)</span></li>
+</ul></li>
+<li><p><strong>Identify the best time to observe a particular celestial event, considering the location’s time zone (UTC).</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))\)</span></li>
+</ul></li>
+<li><p><strong>Explore details about the celestial objects discovered by a specific observer, including their descriptions.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-CelestialObject \Join CelestialObject))\)</span></li>
+</ul></li>
+<li><p><strong>Find information about upcoming meteor showers, specifically where and when they can be observed.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_name = &quot;Meteor Shower&quot;}(Event-Location))\)</span></li>
+</ul></li>
+<li><p><strong>Locate celestial objects of a particular type (e.g., planets) visible from a specific quadrant.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name}(\sigma_{object\_type = &quot;Planet&quot; \land quadrant = &quot;NW&quot;}(CelestialObject \Join CelestialObject-Location \Join EarthLocation))\)</span></li>
+</ul></li>
+<li><p><strong>Discover the celestial events scheduled for a specific date and their locations.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name, location\_id}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(Event-Location))\)</span></li>
+</ul></li>
+<li><p><strong>Determine the celestial objects with the highest altitudes at a given time.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name, altitude}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(CelestialObject-Location \Join CelestialLocation))\)</span></li>
+</ul></li>
+<li><p><strong>Explore details about a specific celestial location, such as RA and Dec.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join CelestialObject-Location \Join CelestialLocation))\)</span></li>
+</ul></li>
+<li><p><strong>Find celestial events with unique characteristics (e.g., total solar eclipses) and their dates.</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_name = &quot;Total Solar Eclipse&quot;}(Event-Location))\)</span></li>
+</ul></li>
+<li><p><strong>Discover celestial objects with unusual relationships (e.g., moons of specific planets).</strong></p>
+<ul>
+<li><span class="math inline">\(\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))\)</span></li>
+</ul></li>
+</ol>
 </section>
 <section id="project-management" class="level4">
 <h4 class="anchored" data-anchor-id="project-management">Project Management</h4>
@@ -3124,12 +3315,14 @@ gantt
     Deliverable 6 Due : milestone, m1, 2023-11-17, 0d
     Semester Project Due : milestone, m1, 2023-12-12, 0d
     section Tasks
-        Database Development:a1, 2023-10-15, 12d
-        Status Report    :a2, 2023-10-27, 7d
-        API Development  :after a2, 14d
-        Status Report    :a3, 2023-11-10, 7d
-        Finishing Touches:a4, 2023-11-27, 15d
-        Final Report     :a5, 2023-12-5, 7d
+        Database Development :a1, 2023-10-15, 12d
+        Status Report :a2, 2023-10-27, 7d
+        API Development :after a2, 14d
+        Status Report :a3, 2023-11-10, 7d
+        Finishing Touches :a4, 2023-11-27, 15d
+        Final Report :2023-12-05, 7d
+
+        
 </pre>
 <div id="mermaid-tooltip-2" class="mermaidTooltip">
 
@@ -3138,8 +3331,6 @@ gantt
 </div>
 </div>
 </div>
-<p>In this chart, there are milestones of when the project deliverables are due and a loose timeline of what we’ll work on and when. We’ll use the status report deliverables as goals for finishing certain aspects of development.</p>
-<p>A lot of the development is based on when we cover topics in class. Generally, during database development, we’ll set up the database and implement queries. Then, during API development, we’ll develop a client program to interact with the database.</p>
 </section>
 
 </main>
