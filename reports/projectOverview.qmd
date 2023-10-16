@@ -25,20 +25,42 @@ See:
 
 #### Problem Description
 
-Problem domain
-: provide a summary of the problem domain, providing context, scope of the area. For example, one might talk about the building murals in Richmond, and provide a bit of history (or pictures), so that someone understands the problem domain.
+<span style="color:#a074c1;">Problem Domain</span>
 
-Need
-: provide a summary of why a database is needed and what problem it might help solve. Why does this database need to be developed?
+: Astronomy, a captivating blend of science and human curiosity, explores the vast expanse of celestial objects, the mysteries of space, and the entirety of our physical universe. This field of study has a rich and storied history that dates back to the earliest civilizations, reflecting our innate desire to comprehend the world that surrounds us.
 
-Context, scope, and perspective
-: Who is the DB for, or what perspective will the DB represent? In the domain of sports teams, is the database for the coach, team owner, player, or fan?
+: In the 3rd century BCE, Greek astronomers like Galileo Galilei introduced groundbreaking methods that substantiated the heliocentric model, reshaping our understanding of the universe. However, the realm of the stars has also played a role in astrology, an ancient practice that linked the positions of celestial bodies to human affairs. It was only in the early 10th and late 11th centuries that a clear distinction between astronomy and astrology emerged. While astrology no longer holds a place within the scientific community, it persists as a cultural and spiritual influence in societies worldwide.
 
-User roles and use cases
-: Identify the different user roles that will interact with the database. Describe their needs and how they will use the database. How will the database be used? Who will be using it? How will they be using it? How will the database be connected to other things?
 
-Security and Privacy
-: Discuss any security and privacy concerns that need to be addressed in the design. Consider user authentication, data encryption, and access controls.
+<span style="color:#a074c1;">Need</span>
+
+: Everything in the sky is constantly moving, and, for those who are interested in astronomy, a tool to look up locations of celestial objects would be useful. Centralizing lots of the information already available into a user-friendly database could make astronomy more accessible, and hobbies which connect you to your surroundings as well as build community are great for your mental health.
+
+<span style="color:#a074c1;">Context, Scope, and Perspective</span>
+
+: This database could be helpful for more than just avid astronomers. For them, we want to give information about where stars, planets, and constellations can be seen in telescopes. For more casual fans, we want to include information about events that can be seen with the naked eye - blue moons, eclipses, meteor showers, etc. Giving information on the history of these events and when they’re next predicted to happen could be useful for anyone who likes to stargaze.
+
+<span style="color:#a074c1;">User roles and Use Cases</span>
+: Amateur Astronomers and Stargazers:
+
+* Usage: They use the database to plan a stargazing session, locate celestial objects, and gain insights into upcoming astronomical events.
+
+* Use Case: Users can input their location and date to find information on celestial events, visible planets, stars, and constellations in the night sky. The database provides real-time information to plan stargazing sessions.
+
+Astrology enthusiasts
+
+* Usage: Astrology enthusiasts can use the database to access astrological data, planetary positions, and celestial events relevant to astrology. The database can provide the astrological significance of astronomical events.
+
+* Use Case: "What significance does mercury's position in the sky have to my life?"
+
+History enthusiasts
+
+* Usage: Information on discoveries and scientists connected to different celestial bodies and events.
+
+* Use Case: Want to know about the first mention of a lunar eclipse? Find out about Zhou-shu, a book from the Zhou Dynasty.
+
+<span style="color:#a074c1;">Security and Privacy</span>
+:  Discuss any security and privacy concerns that need to be addressed in the design. Consider user authentication, data encryption, and access controls.
 
 #### Database Design
 
