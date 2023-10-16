@@ -20,7 +20,7 @@ See:
 
 * [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53)
 * [PITCH VIDEO](https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch)
-* [DESIGN VIDEO]()
+* [DESIGN VIDEO](https://docs.google.com/document/d/1Tp7wg5UqlzqcpHDrfD1bbTSlb7n0gdyaXHxE45HEACM/edit?usp=sharing)
 
 
 #### Problem Description
