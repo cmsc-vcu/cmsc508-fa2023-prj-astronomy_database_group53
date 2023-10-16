@@ -22,6 +22,6 @@ Included are the following files:
 
 [Pitch Video](https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch) - Deliverable 3
 
-[Design Document]() - Deliverable 4
+[Design Document](https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j) - Deliverable 4
 
-[Design Video]() - Deliverable 4
+[Design Video](reports/projectOverview.html) - Deliverable 4
