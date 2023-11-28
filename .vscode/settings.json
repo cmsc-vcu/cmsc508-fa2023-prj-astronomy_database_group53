@@ -1,0 +1,18 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "cmsc508.com",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "DB Project",
+            "database": "23FA_groups_group53",
+            "username": "23FA_olmsteadca",
+            "password": "Shout4_olmsteadca_GOME"
+        }
+    ]
+}
