@@ -1,0 +1,339 @@
+---
+title-block-banner: cropped.jpg
+title: Astronomy Database 
+date: November 23, 2023
+authors: 🌟 Uma Manicka & Celeste Olmstead 🌟
+format:
+    html:
+        theme: cyborg
+        toc: false
+        embed-resources: true
+        linkcolor: pink
+---
+
+(I copy and pasted the first project overview so we can edit it and update whatever we've done since then)
+
+#### 🪐Project Overview🪐 
+
+
+See:
+
+* [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53)
+* [PITCH VIDEO](https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch)
+* [DESIGN VIDEO](https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j)
+
+
+#### Problem Description
+
+<span style="color:#a074c1;">Problem Domain</span>
+
+: Astronomy, a captivating blend of science and human curiosity, explores the vast expanse of celestial objects, the mysteries of space, and the entirety of our physical universe. This field of study has a rich and storied history that dates back to the earliest civilizations, reflecting our innate desire to comprehend the world that surrounds us.
+
+: In the 3rd century BCE, Greek astronomers like Galileo Galilei introduced groundbreaking methods that substantiated the heliocentric model, reshaping our understanding of the universe. 
+
+
+<span style="color:#a074c1;">Need</span>
+
+: Everything in the sky is constantly moving, and, for those who are interested in astronomy, a tool to look up locations of celestial objects would be useful. Centralizing lots of the information already available into a user-friendly database could make astronomy more accessible, and hobbies which connect you to your surroundings as well as build community are great for your mental health.
+
+<span style="color:#a074c1;">Context, Scope, and Perspective</span>
+
+: This database could be helpful for more than just avid astronomers. For them, we want to give information about where stars, planets, and constellations can be seen in telescopes. For more casual fans, we want to include information about events that can be seen with the naked eye - blue moons, eclipses, meteor showers, etc. Giving information on when and where they’re next predicted to happen could be useful for anyone who likes to stargaze.
+
+<span style="color:#a074c1;">User roles and Use Cases</span>
+
+: Amateur Astronomers and Stargazers:
+
+* Usage: They use the database to plan a stargazing session, locate celestial objects, and gain insights into upcoming astronomical events.
+
+* Use Case: Users can input a location to find information on upcoming celestial events, visible planets, stars, and constellations in the night sky. The database provides real-time information to plan stargazing sessions.
+
+<span style="color:#a074c1;">Security and Privacy</span>
+
+: Access Controls
+* Unauthorized users should not be able to access or manipulate the database.
+
+: Data Encryption
+* Data transmitted over the network, especially sensitive user information such as a user's query (in case it has their location), should not be accessible by other users.
+
+: User Authentication
+* We do not plan on having a user authentication as our database will not store user's data or information. It will be purely for querying.
+
+#### Database Design
+
+<span style="color:#a074c1;">Design Tradeoffs</span>
+
+* We removed an idea for an astrology extension to the database. We planned for the user to input their birthdate and be able to receive information on their sun sign, any planet movements affecting their sign, and other astrology considerations. However, this would've added much more complexity to our database. So, we decided to remove this functionality.
+
+* We also were thinking of having the user input their location, and, in return, they'd receive instructions on how to best view a celestial body or event. This would include things like the angle and direction they must look in. We may still be able to do this for the planets, but it would likely be difficult to do this for other bodies.
+
+* One more design consideration is how to handle Location and time. Currently, there are two different tables for celestial coordinates and longitude and latitude coordinates. There's also Altitude and Azimuth coordinates, which, given two set of longitude and latitude and the time, or celestial coordinates and the time, you're able to get the angle and direction you'd have to look to see a celestial body/event. It's a bit of a complex calculation, and we're unsure if performance would be better having a query calculate it or creating another table.
+
+Below is an abstract design of the database:
+```{mermaid}
+%%{init: {'theme':'dark'}}%%
+erDiagram
+    CELESTIAL-OBJECT }o--o{ EVENT : causes
+    CELESTIAL-OBJECT }o--o{ CELESTIAL-OBJECT : linked_to
+    OBSERVER }|--|{ CELESTIAL-OBJECT : discovers
+    OBSERVER }|--|{ EVENT : discovers
+    CELESTIAL-OBJECT }|--|{ LOCATION : viewed_from
+    CELESTIAL-OBJECT }|--|{ CELESTIALLOCATION : has
+    EVENT }|--|{ LOCATION : viewed_from
+```
+
+
+Celestial Objects and Events
+
+* Our idea is that celestial objects can cause events, although events don't always have to be directly caused by a celestial object or may have a cause we are unsure of. Many objects can cause an event, but some do not. 
+
+
+Location
+
+* Both events and ojects have locations that they can be seen from Earth. Events and objects can be seen sometimes only in certain hemispheres or regions (like Aurora Borealis). This allows the user to query the database with questions like: What location has the most meteor showers? This requires splitting the Earth into certain zones, so, when coordinates are inputted, they are classified into a certain zone.
+
+
+Observers
+
+* We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.
+
+
+<span style="color:#a074c1;">**Relational schemas**</span>
+: Below is a list of relations, shown as tables with sample data:
+
+**CelestialObject**
+
+| object_id | object_name      | object_type  | description                                |
+|-----------|------------------|--------------|--------------------------------------------|
+| 1         | andromeda galaxy | galaxy       | Spiral galaxy visible to the naked eye.   |
+| 2         | orion nebula    | nebula        | Emission nebula in the Orion constellation. |
+| 3         | jupiter         | planet        | The largest planet in our solar system.    |
+| 4         | pleiades        | star cluster  |  Open star cluster in Taurus constellation.  |
+| 5         | horsehead nebula | nebula        | Dark nebula in the constellation Orion.    |
+
+
+**Event**
+
+| event_id | event_name    | date       | duration  | frequency   |
+|----------|---------------|------------|-----------|-------------|
+| 1        | eclipse       | 2023-10-20 | 2 hours   | 1/year      |
+| 2        | meteor shower | 2023-11-15 | 6 hours   | 2/month     |
+| 3        | comet sighting | 2024-03-05 | 1 day     | 3/week      |
+| 4        | supernova observation | 2024-06-12 | 4 days   | 4/year      |
+| 5        | planetary conjunction | 2024-08-30 | 0.5 days | 5/decade    |
+
+
+
+**Observer**
+
+| observer_id | first_name  | last_name   |
+|------------|-------------|-------------|
+| 1          | Astronomer  | One         |
+| 2          | Astronomer  | Two         |
+| 3          | Astronomer  | Three       |
+| 4          | Astronomer  | Four        |
+| 5          | Astronomer  | Five        |
+
+
+**EarthLocation**
+
+| location_id | quadrant | latitude  | longitude  | timezone | local_time         |
+|------------|----------|-----------|------------|----------|------------------- |
+| 1          | NW       | 40.7128   | -74.0060   | UTC-4    | 2023-10-15 16:00:00 |
+| 2          | SW       | 34.0522   | -118.2437  | UTC-7    | 2023-10-15 13:00:00 |
+| 3          | NE       | 51.5074   | -0.1278    | UTC+0    | 2023-10-15 20:00:00 |
+| 4          | SE       | 33.4484   | -112.0740  | UTC-7    | 2023-10-15 13:00:00 |
+| 5          | NW       | 41.8781   | -87.6298   | UTC-5    | 2023-10-15 15:00:00 |
+
+
+**CelestialLocation**
+
+| cel_location_id | RA        | Dec             |
+|------------|-------------- |----------------- |
+| 1          | 00h 42m 44s   | +41° 16' 09"     |
+| 2          | 05h 35m 17s   | -05° 23' 28"     |
+| 3          | 20h 22m 38s   | -18° 40' 48"     |
+| 4          | 03h 47m 24s   | +24° 07' 00"     |
+| 5          | 05h 41m 02s   | -02° 27' 30"     |
+
+
+Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.
+
+
+Below is a list of relationships:
+
+* **CelestialObject-Event**: containing the event_id, the object_id, and the date. One event_id can be related to multiple object_id's, but does not need to be related to any.
+
+* **Event-Location**: containing the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.
+
+* **CelestialObject-Location**: containing the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.
+
+* **CelestialObject-CelestialLocation**: containing the cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.
+
+* **Observer-Event**: contains the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.
+
+* **Observer-CelestialObject**: contains the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.
+
+* **CelestialObject-CelestialObject**: contains 2 object_id's. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.
+
+<span style="color:#a074c1;">**BCNF**</span>
+
+**$R_{0}$**, CelestialObject, has functional dependency
+
+* object_id $\rightarrow$ object_name, object_type, description
+
+**$R_{1}$**, Event, has functional dependencies
+
+* event_id $\rightarrow$ event_name, date, duration, frequency
+* event_name $\rightarrow$ duration, frequency
+
+**$R_{3}$**, Observer, has functional dependency
+
+* observer_id $\rightarrow$ first_name, last_name
+
+**$R_{4}$**, EarthLocation, has functional dependencies
+
+* location_id $\rightarrow$ quadrant, longitude, latitude, timezone, local_time
+* longiude, latitude $\rightarrow$ quadrant, timezone
+
+**$R_{4}$**, CelestialLocation, has functional dependency
+
+* cel_location_id $\rightarrow$ RA, Dec
+
+1. **CelestialObject-Event**:
+   - Candidate Key: `{object_id, event_id}`
+   - Functional Dependency: `object_id, event_id → date`
+
+2. **Event-Location**:
+   - Candidate Key: `{event_id, location_id}`
+   - Functional Dependency: `event_id, location_id → date`
+
+3. **CelestialObject-Location**:
+   - Candidate Key: `{object_id, location_id}`
+   - Functional Dependency: `object_id, location_id → date`
+
+4. **CelestialObject-CelestialLocation**:
+   - Candidate Key: `{object_id, cel_location_id}`
+   - Functional Dependency: `object_id, cel_location_id → date`
+
+5. **Observer-Event**:
+   - Candidate Key: `{observer_id, event_id}`
+   - Functional Dependency: `observer_id, event_id → date`
+
+6. **Observer-CelestialObject**:
+   - Candidate Key: `{observer_id, object_id}`
+   - Functional Dependency: `observer_id, object_id → date`
+
+7. **CelestialObject-CelestialObject**:
+   - Candidate Key: `{object_id, related_object_id}`
+   - Functional Dependency: `object_id, related_object_id+
+
+All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.
+
+
+<span style="color:#a074c1;">**Queries**</span>
+
+
+1. **Retrieve names and descriptions of celestial objects visible from a specific location.**
+
+   * $\pi_{object\_name, description}(\sigma_{location\_id = X}(CelestialObject-Location))$
+
+2. **Find upcoming celestial events for a given location.**
+
+   * $\pi_{event\_name, date}(\sigma_{location\_id = X}(Event-Location))$
+
+3. **Identify celestial objects discovered by a specific observer.**
+
+   * $\pi_{object\_name}(\sigma_{observer\_id = X}(Observer-CelestialObject))$
+
+4. **List all celestial events related to a specific celestial object.**
+
+   * $\pi_{event\_name}(\sigma_{object\_id = X}(CelestialObject-Event))$
+
+5. **Find the celestial objects with specific characteristics (e.g., galaxies, stars).**
+
+   * $\pi_{object\_name}(\sigma_{object\_type = "Galaxy" \land X)}(CelestialObject)$
+
+6. **Retrieve the celestial objects observed from a given quadrant.**
+
+   * $\pi_{object\_name}(\sigma_{quadrant = "NW"}(EarthLocation \Join CelestialObject-Location \Join CelestialObject))$
+
+7. **Find events on a specific date.**
+
+   * $\pi_{event\_name}(\sigma_{date = "YYYY-MM-DD"}(Event))$
+
+8. **Get details about celestial locations.**
+
+   * $\pi_{RA, Dec}(\sigma_{cel\_location\_id = X}(CelestialLocation))$
+
+9. **List celestial objects linked to other celestial objects.**
+
+   * $\pi_{object\_name}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$
+
+10. **Find the observers who discovered a specific celestial object.**
+
+    * $\pi_{first\_name, last_name}(\sigma_{object\_id = X}(Observer-CelestialObject))$
+
+11. **Plan a stargazing session by retrieving the celestial objects visible from a specific location and their altitudes.**
+
+    * $\pi_{object\_name, altitude}(\sigma_{location\_id = X}(CelestialObject-Location \Join CelestialLocation))$
+
+12. **Identify the best time to observe a particular celestial event, considering the location's time zone (UTC).**
+
+    * $\pi_{event\_name, date}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))$
+
+13. **Explore details about the celestial objects discovered by a specific observer, including their descriptions.**
+
+    * $\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-CelestialObject \Join CelestialObject))$
+
+14. **Find information about upcoming meteor showers, specifically where and when they can be observed.**
+
+    * $\pi_{event\_name, date}(\sigma_{event\_name = "Meteor Shower"}(Event-Location))$
+
+15. **Locate celestial objects of a particular type (e.g., planets) visible from a specific quadrant.**
+
+    * $\pi_{object\_name}(\sigma_{object\_type = "Planet" \land quadrant = "NW"}(CelestialObject \Join CelestialObject-Location \Join EarthLocation))$
+
+16. **Discover the celestial events scheduled for a specific date and their locations.**
+
+    * $\pi_{event\_name, location\_id}(\sigma_{date = "YYYY-MM-DD"}(Event-Location))$
+
+17. **Determine the celestial objects with the highest altitudes at a given time.**
+
+    * $\pi_{object\_name, altitude}(\sigma_{date = "YYYY-MM-DD"}(CelestialObject-Location \Join CelestialLocation))$
+
+18. **Explore details about a specific celestial location, such as RA and Dec.**
+
+    * $\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join CelestialObject-Location \Join CelestialLocation))$
+
+19. **Find celestial events with unique characteristics (e.g., total solar eclipses) and their dates.**
+
+    * $\pi_{event\_name, date}(\sigma_{event\_name = "Total Solar Eclipse"}(Event-Location))$
+
+20. **Discover celestial objects with unusual relationships (e.g., moons of specific planets).**
+
+    * $\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$
+
+
+#### Project Management
+
+``` {mermaid}
+%%{init: {'theme':'dark'}}%%
+gantt
+    title Semester Project Timeline
+    dateFormat YYYY-MM-DD
+    Deliverable 4 Due : milestone, m1, 2023-10-15, 0d
+    Deliverable 5 Due : milestone, m1, 2023-11-03, 0d
+    Deliverable 6 Due : milestone, m1, 2023-11-17, 0d
+    Semester Project Due : milestone, m1, 2023-12-12, 0d
+    section Tasks
+        Database Development :a1, 2023-10-15, 12d
+        Status Report :a2, 2023-10-27, 7d
+        API Development :after a2, 14d
+        Status Report :a3, 2023-11-10, 7d
+        Finishing Touches :a4, 2023-11-27, 15d
+        Final Report :2023-12-05, 7d
+
+        
+```
+
