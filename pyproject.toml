@@ -2,7 +2,7 @@
 name = "astronomy-database"
 version = "0.1.0"
 description = ""
-authors = ["olmsteadca <olmsteadca@vcu.edu>"]
+authors = ["manickaug <manickaug@vcu.edu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
