@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import os
 import pandas as pd
 from sqlalchemy import create_engine
-import pymysql
+from dotenv import load_dotenv
 
 def db_connection():
     # modify config_map to reflect credentials needed by this program
@@ -12,7 +12,9 @@ def db_connection():
         'host':'CMSC508_HOST',
         'database':'ASTRONOMY_DB_NAME'
     }
+
     # load and store credentials
+    load_dotenv()
     config = {}
     for key in config_map.keys():
         config[key] = os.getenv(config_map[key])
@@ -20,7 +22,7 @@ def db_connection():
     # build a sqlalchemy engine string
     engine_uri = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}/{config['database']}"
 
-    # create a database connection.  THIS IS THE ACTUAL CONNECTION!
+    # create a database connection
     try:
         cnx = create_engine(engine_uri)
     except Exception as e:
@@ -38,24 +40,34 @@ def index():
 def show_observers():
     # db connection
     cnx = db_connection()
-    cursor = cnx.cursor()
 
     #query database
-    sql_query= f"""
+    sql= f"""
     select * from observers
     """
-    cursor.execute(sql_query)
+    try:
+        df = pd.read_sql(sql,cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        df = pd.DataFrame()
 
+    # format data returned
+    df = df.to_dict()
     observer = {}
     observers = []
-    for row in cursor.fetchall():
-        observer['observer_id'] = row['observer_id']
-        observer['first_name'] = row['first_name']
-        observer['last_name'] = row['last_name']
+    i = 0
+    while i < len(df['first_name']):
+        first_name = df['first_name'][i]
+        last_name = df['last_name'][i]
+        observer['observer_id'] = i
+        observer['first_name'] = first_name
+        observer['last_name'] = last_name
         observers.append(observer)
 
+    # if data exists, return it is JSON
     if observers is not None:
-        return jsonify(observers)
+        return jsonify({'observers' : f'{observers}'})
     else:
         return jsonify({'message' : 'Failed to fetch observers'})
 
