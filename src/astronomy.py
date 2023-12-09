@@ -2,34 +2,24 @@ from flask import Flask, request, jsonify
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+import pymysql
 
-#TODO: figure out this connection and querying the database
 def db_connection():
-    # modify config_map to reflect credentials needed by this program
-    config_map = {
-        'user':'23FA_olmsteadca',
-        'password':'Shout4_olmsteadca_GOME',
-        'host':'cmsc508.com',
-        'database':'23FA_groups_group53'
-    }
-    # load and store credentials
-    config = {}
-    for key in config_map.keys():
-        config[key] = os.getenv(config_map[key])
-
-    # build a sqlalchemy engine string
-    engine_uri = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}/{config['database']}"
-
-    # create a database connection.  THIS IS THE ACTUAL CONNECTION!
+    cnx = None
     try:
-        cnx = create_engine(engine_uri)
-    except Exception as e:
-        print(f"create_engine: An error occurred: {e}")
-        return 1
+        cnx = pymysql.connect(
+            host='cmsc508.com',
+            database='23FA_groups_group53',
+            user='23FA_olmsteadca',
+            password='Shout4_olmsteadca_GOME',
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+    except pymysql.Error as e:
+        print(e)
     return cnx
-
+        
 app = Flask(__name__)
-cnx = db_connection()
 
 @app.route('/')
 def index():
@@ -37,29 +27,28 @@ def index():
 
 @app.route('/observers', methods=['GET'])
 def show_observers():
-    # get any queries
-    limit = request.args.get('limit')
-    sort = request.args.getlist('sort')
-    first_name = request.args.get('first_name')
-    last_name = request.args.get('last_name')
+    # db connection
+    cnx = db_connection()
+    cursor = cnx.cursor()
 
-    if limit is None:
-        limit = 10
-    
-    if sort is None:
-        sort = ["id", "asc"]
+    #query database
+    sql_query= f"""
+    select * from observers
+    """
+    cursor.execute(sql_query)
 
-    if first_name is None and last_name is None:
-        #query database
-        pass
-    
-    if last_name is None:
-        #query database
-        pass
-    
-    if first_name is None:
-        #query database
-        pass
+    observer = {}
+    observers = []
+    for row in cursor.fetchall():
+        observer['observer_id'] = row['observer_id']
+        observer['first_name'] = row['first_name']
+        observer['last_name'] = row['last_name']
+        observers.append(observer)
+
+    if observers is not None:
+        return jsonify(observers)
+    else:
+        return jsonify({'message' : 'Failed to fetch observers'})
 
 @app.route('/events', methods=['GET'])
 def show_events():
