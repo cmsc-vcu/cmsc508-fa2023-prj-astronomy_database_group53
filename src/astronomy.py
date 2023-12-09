@@ -7,10 +7,10 @@ from sqlalchemy import create_engine
 def db_connection():
     # modify config_map to reflect credentials needed by this program
     config_map = {
-        'user':'23FA_olmsteadca',
-        'password':'Shout4_olmsteadca_GOME',
-        'host':'cmsc508.com',
-        'database':'23FA_groups_group53'
+        'user':'CMSC508_USER',
+        'password':'CMSC508_PASSWORD',
+        'host':'CMSC508_HOST',
+        'database':'ASTRONOMY_DB_NAME'
     }
     # load and store credentials
     config = {}

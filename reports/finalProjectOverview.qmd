@@ -99,63 +99,198 @@ Observers
 
 
 <span style="color:#a074c1;">**Relational schemas**</span>
-: Below is a list of relations, shown as tables with sample data:
+: Below are our database's tables
+```{python}
+#| eval: true
+#| echo: false
+import os
+import sys
+import pandas as pd
+from tabulate import tabulate
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError, ProgrammingError
+from IPython.display import display, Markdown
+```
 
-**CelestialObject**
+```{python}
+#| eval: true
+#| echo: false
 
-| object_id | object_name      | object_type  | description                                |
-|-----------|------------------|--------------|--------------------------------------------|
-| 1         | andromeda galaxy | galaxy       | Spiral galaxy visible to the naked eye.   |
-| 2         | orion nebula    | nebula        | Emission nebula in the Orion constellation. |
-| 3         | jupiter         | planet        | The largest planet in our solar system.    |
-| 4         | pleiades        | star cluster  |  Open star cluster in Taurus constellation.  |
-| 5         | horsehead nebula | nebula        | Dark nebula in the constellation Orion.    |
+# modify config_map to reflect credentials needed by this program
+config_map = {
+    'user':'CMSC508_USER',
+    'password':'CMSC508_PASSWORD',
+    'host':'CMSC508_HOST',
+    'database':'ASTRONOMY_DB_NAME'
+}
+# load and store credentials
+load_dotenv()
+config = {}
+for key in config_map.keys():
+    config[key] = os.getenv(config_map[key])
+flag = False
+for param in config.keys():
+    if config[param] is None:
+        flag = True
+        print(f"Missing {config_map[param]} in .env file")
+#if flag:
+#    sys.exit(1)
+```
+```{python}
+#| eval: true
+#| echo: false
 
+# build a sqlalchemy engine string
+engine_uri = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}/{config['database']}"
+
+# create a database connection.  THIS IS THE ACTUAL CONNECTION!
+try:
+    cnx = create_engine(engine_uri)
+except ArgumentError as e:
+    print(f"create_engine: Argument Error: {e}")
+    #sys.exit(1)
+except NoSuchModuleError as e:
+    print(f"create_engine: No Such Module Error: {e}")
+    #sys.exit(1)
+except Exception as e:
+    print(f"create_engine: An error occurred: {e}")
+    #sys.exit(1)
+```
+```{python}
+#| echo: false
+#| eval: true
+
+# Do a quick test of the connection and trap the errors better!
+try:
+    databases = pd.read_sql("show databases",cnx)
+except ImportError as e:
+    print(f"Error: {e}")
+except OperationalError as e:
+    print(f"Database/SQL Error:\n{str(e)}\n")
+except ProgrammingError as e:
+    print(f"Programming Error:\n{str(e)}\n")
+except Exception as e:
+    print(f"An error occurred:\n{str(e)}\n")
+
+```
+
+
+**Objects**
+
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from objects;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 **Event**
 
-| event_id | event_name    | date       | duration  | frequency   |
-|----------|---------------|------------|-----------|-------------|
-| 1        | eclipse       | 2023-10-20 | 2 hours   | 1/year      |
-| 2        | meteor shower | 2023-11-15 | 6 hours   | 2/month     |
-| 3        | comet sighting | 2024-03-05 | 1 day     | 3/week      |
-| 4        | supernova observation | 2024-06-12 | 4 days   | 4/year      |
-| 5        | planetary conjunction | 2024-08-30 | 0.5 days | 5/decade    |
-
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from events;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 
 **Observer**
 
-| observer_id | first_name  | last_name   |
-|------------|-------------|-------------|
-| 1          | Astronomer  | One         |
-| 2          | Astronomer  | Two         |
-| 3          | Astronomer  | Three       |
-| 4          | Astronomer  | Four        |
-| 5          | Astronomer  | Five        |
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from observers;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 
-**EarthLocation**
+**Earth Location**
 
-| location_id | quadrant | latitude  | longitude  | timezone | local_time         |
-|------------|----------|-----------|------------|----------|------------------- |
-| 1          | NW       | 40.7128   | -74.0060   | UTC-4    | 2023-10-15 16:00:00 |
-| 2          | SW       | 34.0522   | -118.2437  | UTC-7    | 2023-10-15 13:00:00 |
-| 3          | NE       | 51.5074   | -0.1278    | UTC+0    | 2023-10-15 20:00:00 |
-| 4          | SE       | 33.4484   | -112.0740  | UTC-7    | 2023-10-15 13:00:00 |
-| 5          | NW       | 41.8781   | -87.6298   | UTC-5    | 2023-10-15 15:00:00 |
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from earth_locations;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
+
+**Space Locations**
+
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from space_locations;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 
-**CelestialLocation**
-
-| cel_location_id | RA        | Dec             |
-|------------|-------------- |----------------- |
-| 1          | 00h 42m 44s   | +41° 16' 09"     |
-| 2          | 05h 35m 17s   | -05° 23' 28"     |
-| 3          | 20h 22m 38s   | -18° 40' 48"     |
-| 4          | 03h 47m 24s   | +24° 07' 00"     |
-| 5          | 05h 41m 02s   | -02° 27' 30"     |
-
+** Object-Event **
+```{python}
+#| echo: false
+#| eval: true
+sql = f"""
+select * from object_event;
+"""
+## Add code to list roles table here
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+```
 
 Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.
 
@@ -315,8 +450,6 @@ All these tables are in BCNF because their candidate keys determine all other at
     * $\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$
 
 
-### Database Creation
-
 ```{python}
 #| eval: true
 #| echo: false
@@ -329,6 +462,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 from IPython.display import display, Markdown
 ```
+
 ```{python}
 #| eval: true
 #| echo: false
@@ -338,7 +472,7 @@ config_map = {
     'user':'CMSC508_USER',
     'password':'CMSC508_PASSWORD',
     'host':'CMSC508_HOST',
-    'database':'23FA_groups_group53'
+    'database':'ASTRONOMY_DB_NAME'
 }
 # load and store credentials
 load_dotenv()
@@ -353,8 +487,6 @@ for param in config.keys():
 #if flag:
 #    sys.exit(1)
 ```
-
-
 ```{python}
 #| eval: true
 #| echo: false
@@ -375,7 +507,6 @@ except Exception as e:
     print(f"create_engine: An error occurred: {e}")
     #sys.exit(1)
 ```
-
 ```{python}
 #| echo: false
 #| eval: true
@@ -393,12 +524,11 @@ except Exception as e:
     print(f"An error occurred:\n{str(e)}\n")
 
 ```
-
 ```{python}
 #| echo: false
 #| eval: true
 sql = f"""
-select * from people;
+select * from observers;
 """
 ## Add code to list roles table here
 try:
