@@ -108,6 +108,17 @@ doc = ["doc8", "sphinx (>=7.0.0)", "sphinx-autobuild", "sphinx-autodoc-typehints
 test = ["dateparser (==1.*)", "pre-commit", "pytest", "pytest-cov", "pytest-mock", "pytz (==2021.1)", "simplejson (==3.*)"]
 
 [[package]]
+name = "astronomy-engine"
+version = "2.1.17"
+description = "Astronomy calculation for Sun, Moon, and planets."
+optional = false
+python-versions = "*"
+files = [
+    {file = "astronomy-engine-2.1.17.tar.gz", hash = "sha256:2b50f2c0e57b64e1fcc38d357be60ec07046287cf899a5b69949d41ede587c71"},
+    {file = "astronomy_engine-2.1.17-py3-none-any.whl", hash = "sha256:02b071e7a2b974a2300ef4d81fb40770fdb6e920c7114d90049dcb9ad74098db"},
+]
+
+[[package]]
 name = "asttokens"
 version = "2.4.1"
 description = "Annotate AST trees with source code positions"
@@ -3001,4 +3012,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "42ee250601d2efbd9122637dc00362715d4f11382fd48ba80dfa267863d13cb8"
+content-hash = "03ca525639d967fb505d34f7e54144ebab4cb5d0018b0491c80ce707a471b7d7"

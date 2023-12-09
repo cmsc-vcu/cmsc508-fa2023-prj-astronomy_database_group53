@@ -6,8 +6,16 @@ drop table if exists objects;
 drop table if exists events;
 drop table if exists earth_locations;
 drop table if exists space_locations;
+drop table if exists object_event;
+drop table if exists object_location;
+drop table if exists object_space_location;
+drop table if exists object_object;
+drop table if exists event_location;
+drop table if exists observer_event;
+drop table if exists observer_object;
 
 SET FOREIGN_KEY_CHECKS=1;
+
 create table observers (
     observer_id int not null primary key,
     first_name varchar(255) not null,
@@ -58,7 +66,7 @@ create table earth_locations (
     quadrant varchar(2),
     latitude float not null,
     longitude float not null,
-    timezone varchar not null,
+    timezone varchar(255) not null,
     local_time datetime not null
 );
 
@@ -72,10 +80,10 @@ INSERT INTO earth_locations (earth_location_id, quadrant, latitude, longitude, t
 create table space_locations (
     space_location_id int not null primary key,
     ra time not null,
-    dec float not null
+    de varchar(255) not null
 );
 
-INSERT INTO space_locations (space_location_id, ra, dec) VALUES
+INSERT INTO space_locations (space_location_id, ra, de) VALUES
     (1, '00:42:44', '+41° 16'' 09"'),
     (2, '05:35:17', '-05° 23'' 28"'),
     (3, '20:22:38', '-18° 40'' 48"'),
@@ -117,7 +125,7 @@ CREATE TABLE object_location (
 );
 
 CREATE TABLE object_space_location (
-    int id auto_increment,
+    id int auto_increment,
     object_id INT NOT NULL,
     space_location_id INT NOT NULL,
     PRIMARY KEY (id),
@@ -137,7 +145,7 @@ CREATE TABLE observer_event (
 );
 
 CREATE TABLE observer_object (
-    id INT auto_increment
+    id INT auto_increment,
     observer_id INT NOT NULL,
     object_id INT NOT NULL,
     PRIMARY KEY (id),
@@ -146,8 +154,8 @@ CREATE TABLE observer_object (
     unique(observer_id, object_id)
 );
 
-CREATE TABLE object-object (
-    id INT auto_increment
+CREATE TABLE object_object (
+    id INT auto_increment,
     object1_id INT NOT NULL,
     object2_id INT NOT NULL,
     PRIMARY KEY (id),
@@ -162,11 +170,11 @@ SELECT o.object_id, e.event_id, e.date_occurred
 FROM objects o, events e;
 
 INSERT INTO event_location (event_id, location_id)
-SELECT e.event_id, el.location_id
+SELECT e.event_id, el.earth_location_id
 FROM events e, earth_locations el;
 
 INSERT INTO object_location (object_id, location_id)
-SELECT o.object_id, el.location_id
+SELECT o.object_id, el.earth_location_id
 FROM objects o, earth_locations el;
 
 INSERT INTO object_space_location (object_id, space_location_id)

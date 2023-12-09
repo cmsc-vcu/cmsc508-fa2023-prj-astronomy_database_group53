@@ -7,3 +7,4 @@ In this folder, you'll find:
 | Name | Description |
 |------|-------------|
 | *projectOverview* | Contains description of problem database solves and details of the database design | 
+| *finalProjectOverview* | Contains | 
