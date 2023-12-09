@@ -5,18 +5,27 @@ from sqlalchemy import create_engine
 import pymysql
 
 def db_connection():
-    cnx = None
+    # modify config_map to reflect credentials needed by this program
+    config_map = {
+        'user':'CMSC508_USER',
+        'password':'CMSC508_PASSWORD',
+        'host':'CMSC508_HOST',
+        'database':'ASTRONOMY_DB_NAME'
+    }
+    # load and store credentials
+    config = {}
+    for key in config_map.keys():
+        config[key] = os.getenv(config_map[key])
+
+    # build a sqlalchemy engine string
+    engine_uri = f"mysql+pymysql://{config['user']}:{config['password']}@{config['host']}/{config['database']}"
+
+    # create a database connection.  THIS IS THE ACTUAL CONNECTION!
     try:
-        cnx = pymysql.connect(
-            host='cmsc508.com',
-            database='23FA_groups_group53',
-            user='23FA_olmsteadca',
-            password='Shout4_olmsteadca_GOME',
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
-        )
-    except pymysql.Error as e:
-        print(e)
+        cnx = create_engine(engine_uri)
+    except Exception as e:
+        print(f"create_engine: An error occurred: {e}")
+        return 1
     return cnx
         
 app = Flask(__name__)
