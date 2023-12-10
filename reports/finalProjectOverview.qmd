@@ -100,6 +100,8 @@ Observers
 
 <span style="color:#a074c1;">**Our Tables**</span>
 
+* (you can tab through them)
+
 ```{python}
 #| eval: true
 #| echo: false
@@ -175,8 +177,9 @@ except Exception as e:
 
 ```
 
+::: {.panel-tabset}
 
-**Objects**
+## Objects
 
 ```{python}
 #| echo: false
@@ -195,7 +198,7 @@ except Exception as e:
 df
 ```
 
-**Event**
+## Event
 
 ```{python}
 #| echo: false
@@ -215,7 +218,7 @@ df
 ```
 
 
-**Observer**
+## Observer
 
 ```{python}
 #| echo: false
@@ -235,7 +238,7 @@ df
 ```
 
 
-**Earth Location**
+## Earth Location
 
 ```{python}
 #| echo: false
@@ -254,7 +257,7 @@ except Exception as e:
 df
 ```
 
-**Space Locations**
+## Space Locations
 
 ```{python}
 #| echo: false
@@ -273,9 +276,12 @@ except Exception as e:
 df
 ```
 
-<span style="color:#a074c1;">**Relational Tables**</span>
+:::
 
-**Object-Event**
+<span style="color:#a074c1;">**Our Associative Tables**</span>
+
+::: {.panel-tabset}
+## Object-Event
 ```{python}
 #| echo: false
 #| eval: true
@@ -293,7 +299,7 @@ except Exception as e:
 df
 ```
 
-**Object-Location**
+## Object-Location
 
 ```{python}
 #| echo: false
@@ -312,7 +318,7 @@ except Exception as e:
 df
 ```
 
-**Object-Space Location**
+## Object-Space Location
 
 ```{python}
 #| echo: false
@@ -331,7 +337,7 @@ except Exception as e:
 df
 ```
 
-**Object-Object**
+## Object-Object
 
 ```{python}
 #| echo: false
@@ -350,7 +356,7 @@ except Exception as e:
 df
 ```
 
-**Event-Location**
+## Event-Location
 
 ```{python}
 #| echo: false
@@ -369,7 +375,7 @@ except Exception as e:
 df
 ```
 
-**Observer-Event**
+## Observer-Event
 
 ```{python}
 #| echo: false
@@ -388,7 +394,7 @@ except Exception as e:
 df
 ```
 
-**Observer-Object**
+## Observer-Object
 
 ```{python}
 #| echo: false
@@ -406,6 +412,8 @@ except Exception as e:
     df = pd.DataFrame()
 df
 ```
+
+::: 
 
 Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.
 
