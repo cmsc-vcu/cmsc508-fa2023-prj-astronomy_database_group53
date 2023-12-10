@@ -54,18 +54,14 @@ def show_observers():
 
     # format data returned
     df = df.to_dict()
-    observer = {}
     observers = []
-    i = 0
-    while i < len(df['observer_id']):
-        id = df['observer_id'][i]
-        first_name = df['first_name'][i]
-        last_name = df['last_name'][i]
-        observer['observer_id'] = id
-        observer['first_name'] = first_name
-        observer['last_name'] = last_name
+
+    for i in range(len(df['observer_id'])):
+        observer = {}
+        observer['observer_id'] = df['observer_id'][i]
+        observer['first_name'] = df['first_name'][i]
+        observer['last_name'] = df['last_name'][i]
         observers.append(observer)
-        i = i + 1
 
     # if data exists, return it is JSON
     if observers is not None:
@@ -91,10 +87,10 @@ def show_events():
 
     # format data returned
     df = df.to_dict()
-    event = {}
     events = []
     i = 0
     while i < len(df['event_id']):
+        event = {}
         id = df['event_id'][i]
         name = df['event_name'][i]
         date = df['date_occurred'][i]
@@ -132,10 +128,10 @@ def show_objects():
 
     # format data returned
     df = df.to_dict()
-    object = {}
     objects = []
     i = 0
     while i < len(df['object_id']):
+        object = {}
         id = df['object_id'][i]
         name = df['object_name'][i]
         type = df['type'][i]
@@ -171,10 +167,10 @@ def show_earth_locations():
 
     # format data returned
     df = df.to_dict()
-    location = {}
     locations = []
     i = 0
     while i < len(df['earth_location_id']):
+        location = {}
         id = df['earth_location_id'][i]
         quad = df['quadrant'][i]
         lat = df['latitude'][i]
@@ -198,6 +194,7 @@ def show_earth_locations():
     else:
         return jsonify({'message' : 'Failed to fetch observers'})
 
+#TODO: creates an error: Object of type Timedelta is not JSON serializable
 @app.route('/space_locations', methods=['GET'])
 def show_space_locations():
     # db connection
@@ -216,10 +213,10 @@ def show_space_locations():
 
     # format data returned
     df = df.to_dict()
-    location = {}
     locations = []
     i = 0
     while i < len(df['space_location_id']):
+        location = {}
         id = df['space_location_id'][i]
         ra = df['ra'][i]
         de = df['de'][i]
@@ -233,7 +230,7 @@ def show_space_locations():
 
     # if data exists, return it is JSON
     if locations is not None:
-        return locations
+        return jsonify(locations)
     else:
         return jsonify({'message' : 'Failed to fetch observers'})
 
