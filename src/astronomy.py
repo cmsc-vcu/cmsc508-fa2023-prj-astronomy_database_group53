@@ -129,10 +129,25 @@ def show_events():
     # db connection
     cnx = db_connection()
 
-    #query database
-    sql= f"""
-    select * from events
-    """
+    # get query parameters from URL
+    sort_by = request.args.get('sort_by')
+    order_by = request.args.get('order_by')
+    per_page = request.args.get('per_page')
+
+    # query database
+    sql = "select * from events"
+
+    # add filters based on the provided query parameters
+    if sort_by:
+        sql += f" order by {sort_by}"
+        if order_by:
+            sql += f" {order_by}"
+
+    if per_page:
+        sql += f" limit {per_page}"
+        page = request.args.get('page', default=1, type=int)
+        if page > 1:
+            sql += f" offset {per_page * (page - 1)}"
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -201,10 +216,26 @@ def show_objects():
     # db connection
     cnx = db_connection()
 
-    #query database
-    sql= f"""
-    select * from objects
-    """
+    # get query parameters from URL
+    sort_by = request.args.get('sort_by')
+    order_by = request.args.get('order_by')
+    per_page = request.args.get('per_page')
+
+    # query database
+    sql = "select * from objects"
+
+    # add filters based on the provided query parameters
+    if sort_by:
+        sql += f" order by {sort_by}"
+        if order_by:
+            sql += f" {order_by}"
+
+    if per_page:
+        sql += f" limit {per_page}"
+        page = request.args.get('page', default=1, type=int)
+        if page > 1:
+            sql += f" offset {per_page * (page - 1)}"
+    
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -270,10 +301,26 @@ def show_earth_locations():
     # db connection
     cnx = db_connection()
 
-    #query database
-    sql= f"""
-    select * from earth_locations
-    """
+    # get query parameters from URL
+    sort_by = request.args.get('sort_by')
+    order_by = request.args.get('order_by')
+    per_page = request.args.get('per_page')
+
+    # query database
+    sql = "select * from earth_locations"
+
+    # add filters based on the provided query parameters
+    if sort_by:
+        sql += f" order by {sort_by}"
+        if order_by:
+            sql += f" {order_by}"
+
+    if per_page:
+        sql += f" limit {per_page}"
+        page = request.args.get('page', default=1, type=int)
+        if page > 1:
+            sql += f" offset {per_page * (page - 1)}"
+            
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -348,10 +395,26 @@ def show_space_locations():
     # db connection
     cnx = db_connection()
 
-    #query database
-    sql= f"""
-    select * from space_locations
-    """
+    # get query parameters from URL
+    sort_by = request.args.get('sort_by')
+    order_by = request.args.get('order_by')
+    per_page = request.args.get('per_page')
+
+    # query database
+    sql = "select * from space_locations"
+
+    # add filters based on the provided query parameters
+    if sort_by:
+        sql += f" order by {sort_by}"
+        if order_by:
+            sql += f" {order_by}"
+
+    if per_page:
+        sql += f" limit {per_page}"
+        page = request.args.get('page', default=1, type=int)
+        if page > 1:
+            sql += f" offset {per_page * (page - 1)}"
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
