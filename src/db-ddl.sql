@@ -123,6 +123,7 @@ CREATE TABLE object_event (
     id int auto_increment,
     object_id INT NOT NULL,
     event_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (object_id) REFERENCES objects(object_id) on delete cascade,
     FOREIGN KEY (event_id) REFERENCES events(event_id) on delete cascade,
@@ -133,6 +134,7 @@ CREATE TABLE event_location (
     id int auto_increment,
     event_id INT NOT NULL,
     location_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (event_id) REFERENCES events(event_id) on delete cascade,
     FOREIGN KEY (location_id) REFERENCES earth_locations(earth_location_id) on delete cascade,
@@ -144,6 +146,7 @@ CREATE TABLE object_location (
     id int auto_increment,
     object_id INT NOT NULL,
     location_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (object_id) REFERENCES objects(object_id) on delete cascade,
     FOREIGN KEY (location_id) REFERENCES earth_locations(earth_location_id) on delete cascade,
@@ -155,6 +158,7 @@ CREATE TABLE object_space_location (
     id int auto_increment,
     object_id INT NOT NULL,
     space_location_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (object_id) REFERENCES objects(object_id) on delete cascade,
     FOREIGN KEY (space_location_id) REFERENCES space_locations(space_location_id) on delete cascade,
@@ -165,6 +169,7 @@ CREATE TABLE observer_event (
     id int auto_increment,
     observer_id INT NOT NULL,
     event_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (observer_id) REFERENCES observers(observer_id) on delete cascade,
     FOREIGN KEY (event_id) REFERENCES events(event_id) on delete cascade,
@@ -175,6 +180,7 @@ CREATE TABLE observer_object (
     id INT auto_increment,
     observer_id INT NOT NULL,
     object_id INT NOT NULL,
+    date_occurred date NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (observer_id) REFERENCES observers(observer_id) on delete cascade,
     FOREIGN KEY (object_id) REFERENCES objects(object_id) on delete cascade,
@@ -192,24 +198,24 @@ CREATE TABLE object_object (
 );
 
 
-INSERT INTO object_event (object_id, event_id)
+INSERT INTO object_event (object_id, event_id, date_occurred)
 VALUES
-    (5, 6), -- sol and total solar eclipse
-    (10, 1), -- total lunar eclipse
-    (8, 5), -- Saturn and Planetary Conjunction
-    (3, 5), -- jupiter and Planetary Conjunction
-    (4, 2), -- Star Cluster and Meteor Shower
-    (11, 7), -- super blue moon
-    (5, 1); -- supernova
+    (5, 6, '2023-12-01'), -- sol and total solar eclipse
+    (10, 1, '2023-10-20'), -- total lunar eclipse
+    (8, 5, '2024-08-30'), -- Saturn and Planetary Conjunction
+    (3, 5, '2024-08-30'), -- jupiter and Planetary Conjunction
+    (4, 2, '2023-11-15'), -- Star Cluster and Meteor Shower
+    (11, 7, '2023-12-14'), -- super blue moon
+    (5, 1, '2024-06-12'); -- supernova
 
-INSERT INTO event_location (event_id, location_id)
+INSERT INTO event_location (event_id, location_id, date_occurred)
 VALUES
-    (1, 1), -- lunar eclipse in Boston
-    (2, 2), -- Meteor Shower in San Francisco
-    (3, 3), -- comet Sighting Miami
-    (4, 4), -- supernova Observation Los Angeles
-    (5, 5), -- planetary conj philly
-    (7, 9); -- super blue moon paris
+    (1, 1, '2023-10-20'), -- lunar eclipse in Boston
+    (2, 2, '2023-11-15'), -- Meteor Shower in San Francisco
+    (3, 3, '2024-03-05'), -- comet Sighting Miami
+    (4, 4, '2024-06-12'), -- supernova Observation Los Angeles
+    (5, 5, '2024-08-30'), -- planetary conj philly
+    (7, 9, '2024-07-25'); -- super blue moon paris
 
 
 INSERT INTO object_location (object_id, location_id)
