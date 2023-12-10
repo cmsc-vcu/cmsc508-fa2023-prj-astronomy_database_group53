@@ -3520,251 +3520,1055 @@ erDiagram
 <dl>
 <dt><span style="color:#a074c1;"><strong>Relational schemas</strong></span></dt>
 <dd>
-Below is a list of relations, shown as tables with sample data:
+Below are our database’s tables
 </dd>
 </dl>
-<p><strong>CelestialObject</strong></p>
-<table class="table">
-<colgroup>
-<col style="width: 12%">
-<col style="width: 20%">
-<col style="width: 16%">
-<col style="width: 50%">
-</colgroup>
+<p><strong>Objects</strong></p>
+<div class="cell" data-execution_count="5">
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>object_id</th>
-<th>object_name</th>
-<th>object_type</th>
-<th>description</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">object_id</th>
+<th data-quarto-table-cell-role="th">object_name</th>
+<th data-quarto-table-cell-role="th">type</th>
+<th data-quarto-table-cell-role="th">description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
 <td>andromeda galaxy</td>
 <td>galaxy</td>
 <td>Spiral galaxy visible to the naked eye.</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
 <td>orion nebula</td>
 <td>nebula</td>
 <td>Emission nebula in the Orion constellation.</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
 <td>jupiter</td>
 <td>planet</td>
 <td>The largest planet in our solar system.</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
 <td>pleiades</td>
 <td>star cluster</td>
 <td>Open star cluster in Taurus constellation.</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
+<td>sun</td>
+<td>star</td>
+<td>our solar systems star</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
 <td>horsehead nebula</td>
 <td>nebula</td>
 <td>Dark nebula in the constellation Orion.</td>
 </tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>andromeda ii</td>
+<td>galaxy</td>
+<td>Dwarf galaxy in the Andromeda Galaxy subgroup.</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>saturn</td>
+<td>planet</td>
+<td>Sixth planet from the Sun, known for its promi...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>crab nebula</td>
+<td>nebula</td>
+<td>Supernova remnant in the constellation Taurus.</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>Ganymede</td>
+<td>moon</td>
+<td>Jupiters largest moon</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>moon</td>
+<td>moon</td>
+<td>Earths moon</td>
+</tr>
 </tbody>
 </table>
+
+</div>
+</div>
+</div>
 <p><strong>Event</strong></p>
-<table class="table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 24%">
-<col style="width: 19%">
-<col style="width: 18%">
-<col style="width: 21%">
-</colgroup>
+<div class="cell" data-execution_count="6">
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>event_id</th>
-<th>event_name</th>
-<th>date</th>
-<th>duration</th>
-<th>frequency</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">event_id</th>
+<th data-quarto-table-cell-role="th">event_name</th>
+<th data-quarto-table-cell-role="th">date_occurred</th>
+<th data-quarto-table-cell-role="th">duration</th>
+<th data-quarto-table-cell-role="th">frequency</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
-<td>eclipse</td>
+<td>total lunar eclipse</td>
 <td>2023-10-20</td>
-<td>2 hours</td>
-<td>1/year</td>
+<td>2.0</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
 <td>meteor shower</td>
 <td>2023-11-15</td>
-<td>6 hours</td>
-<td>2/month</td>
+<td>6.0</td>
+<td>2.0</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
 <td>comet sighting</td>
 <td>2024-03-05</td>
-<td>1 day</td>
-<td>3/week</td>
+<td>1.0</td>
+<td>3.0</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
 <td>supernova observation</td>
 <td>2024-06-12</td>
-<td>4 days</td>
-<td>4/year</td>
+<td>4.0</td>
+<td>4.0</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
 <td>planetary conjunction</td>
 <td>2024-08-30</td>
-<td>0.5 days</td>
-<td>5/decade</td>
+<td>0.5</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>total solar eclipse</td>
+<td>2023-12-01</td>
+<td>2.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>super blue moon</td>
+<td>2023-12-14</td>
+<td>3.5</td>
+<td>2.5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>hypernova observation</td>
+<td>2024-04-20</td>
+<td>1.5</td>
+<td>3.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>bright comet sighting</td>
+<td>2024-07-25</td>
+<td>2.0</td>
+<td>4.0</td>
 </tr>
 </tbody>
 </table>
+
+</div>
+</div>
+</div>
 <p><strong>Observer</strong></p>
-<table class="table">
+<div class="cell" data-execution_count="7">
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>observer_id</th>
-<th>first_name</th>
-<th>last_name</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">observer_id</th>
+<th data-quarto-table-cell-role="th">first_name</th>
+<th data-quarto-table-cell-role="th">last_name</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
-<td>Astronomer</td>
-<td>One</td>
+<td>Henrietta</td>
+<td>Leavitt</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
-<td>Astronomer</td>
-<td>Two</td>
+<td>Hypatia</td>
+<td>Alexandria</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
-<td>Astronomer</td>
-<td>Three</td>
+<td>Uma</td>
+<td>Manicka</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
-<td>Astronomer</td>
-<td>Four</td>
+<td>Celeste</td>
+<td>Olmstead</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
-<td>Astronomer</td>
-<td>Five</td>
+<td>John</td>
+<td>Leonard</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>Astrid</td>
+<td>Vega</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>Galileo</td>
+<td>Galilei</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>Maria</td>
+<td>Mitchell</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>Isaac</td>
+<td>Newton</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>Catherine</td>
+<td>Herschel</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>Edmond</td>
+<td>Halley</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>12</td>
+<td>Caroline</td>
+<td>Herschel</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>13</td>
+<td>Tycho</td>
+<td>Brahe</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>14</td>
+<td>Edwin</td>
+<td>Hubble</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>15</td>
+<td>Annie</td>
+<td>Jump Cannon</td>
 </tr>
 </tbody>
 </table>
-<p><strong>EarthLocation</strong></p>
-<table class="table">
-<colgroup>
-<col style="width: 16%">
-<col style="width: 13%">
-<col style="width: 14%">
-<col style="width: 16%">
-<col style="width: 13%">
-<col style="width: 25%">
-</colgroup>
+
+</div>
+</div>
+</div>
+<p><strong>Earth Location</strong></p>
+<div class="cell" data-execution_count="8">
+<div class="cell-output cell-output-display" data-execution_count="24">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>location_id</th>
-<th>quadrant</th>
-<th>latitude</th>
-<th>longitude</th>
-<th>timezone</th>
-<th>local_time</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">earth_location_id</th>
+<th data-quarto-table-cell-role="th">quadrant</th>
+<th data-quarto-table-cell-role="th">latitude</th>
+<th data-quarto-table-cell-role="th">longitude</th>
+<th data-quarto-table-cell-role="th">timezone</th>
+<th data-quarto-table-cell-role="th">local_time</th>
+<th data-quarto-table-cell-role="th">description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
 <td>NW</td>
 <td>40.7128</td>
 <td>-74.0060</td>
 <td>UTC-4</td>
 <td>2023-10-15 16:00:00</td>
+<td>New York City, USA</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
 <td>SW</td>
 <td>34.0522</td>
-<td>-118.2437</td>
+<td>-118.2440</td>
 <td>UTC-7</td>
 <td>2023-10-15 13:00:00</td>
+<td>Los Angeles, USA</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
 <td>NE</td>
 <td>51.5074</td>
 <td>-0.1278</td>
 <td>UTC+0</td>
 <td>2023-10-15 20:00:00</td>
+<td>London, UK</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
 <td>SE</td>
 <td>33.4484</td>
 <td>-112.0740</td>
 <td>UTC-7</td>
 <td>2023-10-15 13:00:00</td>
+<td>Phoenix, USA</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
 <td>NW</td>
 <td>41.8781</td>
 <td>-87.6298</td>
 <td>UTC-5</td>
 <td>2023-10-15 15:00:00</td>
+<td>Chicago, USA</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>SE</td>
+<td>-23.5505</td>
+<td>-46.6333</td>
+<td>UTC-3</td>
+<td>2023-10-15 14:00:00</td>
+<td>Sao Paulo, Brazil</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>NE</td>
+<td>55.7558</td>
+<td>37.6176</td>
+<td>UTC+3</td>
+<td>2023-10-15 21:00:00</td>
+<td>Moscow, Russia</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>SW</td>
+<td>-33.8688</td>
+<td>151.2090</td>
+<td>UTC+11</td>
+<td>2023-10-16 01:00:00</td>
+<td>Sydney, Australia</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>NW</td>
+<td>48.8566</td>
+<td>2.3522</td>
+<td>UTC+1</td>
+<td>2023-10-15 17:00:00</td>
+<td>Paris, France</td>
 </tr>
 </tbody>
 </table>
-<p><strong>CelestialLocation</strong></p>
-<table class="table">
+
+</div>
+</div>
+</div>
+<p><strong>Space Locations</strong></p>
+<div class="cell" data-execution_count="9">
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
 <thead>
 <tr class="header">
-<th>cel_location_id</th>
-<th>RA</th>
-<th>Dec</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">space_location_id</th>
+<th data-quarto-table-cell-role="th">ra</th>
+<th data-quarto-table-cell-role="th">de</th>
+<th data-quarto-table-cell-role="th">description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
 <td>1</td>
-<td>00h 42m 44s</td>
-<td>+41° 16’ 09”</td>
+<td>0 days 00:42:44</td>
+<td>+41° 16&#39; 09&quot;</td>
+<td>Constellation Andromeda</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
 <td>2</td>
-<td>05h 35m 17s</td>
-<td>-05° 23’ 28”</td>
+<td>0 days 05:35:17</td>
+<td>-05° 23&#39; 28&quot;</td>
+<td>Constellation Taurus</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
 <td>3</td>
-<td>20h 22m 38s</td>
-<td>-18° 40’ 48”</td>
+<td>0 days 20:22:38</td>
+<td>-18° 40&#39; 48&quot;</td>
+<td>Center of the Milky Way</td>
 </tr>
 <tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
 <td>4</td>
-<td>03h 47m 24s</td>
-<td>+24° 07’ 00”</td>
+<td>0 days 05:41:02</td>
+<td>-02° 27&#39; 30&quot;</td>
+<td>Constellation Orion</td>
 </tr>
 <tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
 <td>5</td>
-<td>05h 41m 02s</td>
-<td>-02° 27’ 30”</td>
+<td>0 days 12:30:55</td>
+<td>-10° 12&#39; 15&quot;</td>
+<td>Constellation Virgo</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>0 days 22:15:33</td>
+<td>+02° 50&#39; 20&quot;</td>
+<td>Constellation Aquarius</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>0 days 21:04:10</td>
+<td>-15° 36&#39; 22&quot;</td>
+<td>Constellation Capricornus</td>
 </tr>
 </tbody>
 </table>
+
+</div>
+</div>
+</div>
+<p>** Object-Event **</p>
+<div class="cell" data-execution_count="10">
+<div class="cell-output cell-output-display" data-execution_count="26">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">object_id</th>
+<th data-quarto-table-cell-role="th">event_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>7</td>
+<td>5</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>10</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>5</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>3</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>3</td>
+<td>8</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>1</td>
+<td>5</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>6</td>
+<td>11</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Object-Location **</p>
+<div class="cell" data-execution_count="11">
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">object_id</th>
+<th data-quarto-table-cell-role="th">location_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>1</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>5</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>6</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>7</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>9</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>10</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>11</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Object-Space Location **</p>
+<div class="cell" data-execution_count="12">
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">object_id</th>
+<th data-quarto-table-cell-role="th">space_location_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>4</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>6</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>7</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>8</td>
+<td>7</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>9</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>10</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>11</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Object-Object **</p>
+<div class="cell" data-execution_count="13">
+<div class="cell-output cell-output-display" data-execution_count="29">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">object1_id</th>
+<th data-quarto-table-cell-role="th">object2_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>3</td>
+<td>8</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Event-Location **</p>
+<div class="cell" data-execution_count="14">
+<div class="cell-output cell-output-display" data-execution_count="30">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">event_id</th>
+<th data-quarto-table-cell-role="th">location_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>7</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Observer-Event **</p>
+<div class="cell" data-execution_count="15">
+<div class="cell-output cell-output-display" data-execution_count="31">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">observer_id</th>
+<th data-quarto-table-cell-role="th">event_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>10</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>11</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>12</td>
+<td>12</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>13</td>
+<td>13</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>14</td>
+<td>14</td>
+<td>8</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>15</td>
+<td>15</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>** Observer-Object **</p>
+<div class="cell" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="32">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">observer_id</th>
+<th data-quarto-table-cell-role="th">object_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>1</td>
+<td>3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2</td>
+<td>2</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>4</td>
+<td>4</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>5</td>
+<td>10</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>6</td>
+<td>9</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>8</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>9</td>
+<td>8</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>10</td>
+<td>10</td>
+<td>1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>11</td>
+<td>11</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">11</td>
+<td>12</td>
+<td>12</td>
+<td>5</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">12</td>
+<td>13</td>
+<td>13</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">13</td>
+<td>14</td>
+<td>14</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>15</td>
+<td>15</td>
+<td>11</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 <p>Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.</p>
 <p>Below is a list of relationships:</p>
 <ul>
@@ -3921,59 +4725,6 @@ Below is a list of relations, shown as tables with sample data:
 </ul></li>
 </ol>
 </section>
-<section id="database-creation" class="level3">
-<h3 class="anchored" data-anchor-id="database-creation">Database Creation</h3>
-<div class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display" data-execution_count="5">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">observer_id</th>
-<th data-quarto-table-cell-role="th">first_name</th>
-<th data-quarto-table-cell-role="th">last_name</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>1</td>
-<td>Henrietta</td>
-<td>Leavitt</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>2</td>
-<td>Hypatia</td>
-<td>Alexandria</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>3</td>
-<td>Uma</td>
-<td>Manicka</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>4</td>
-<td>Celeste</td>
-<td>Olmstead</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>5</td>
-<td>John</td>
-<td>Leonard</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
 <section id="project-management" class="level4">
 <h4 class="anchored" data-anchor-id="project-management">Project Management</h4>
 <div class="cell">
@@ -4002,7 +4753,6 @@ gantt
 </div>
 </div>
 </div>
-</section>
 </section>
 
 </main>

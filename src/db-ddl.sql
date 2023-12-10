@@ -56,14 +56,9 @@ INSERT INTO objects (object_id, object_name, type, description) VALUES
     (6, 'horsehead nebula', 'nebula', 'Dark nebula in the constellation Orion.'),
     (7, 'andromeda ii', 'galaxy', 'Dwarf galaxy in the Andromeda Galaxy subgroup.'),
     (8, 'saturn', 'planet', 'Sixth planet from the Sun, known for its prominent rings.'),
-    (9, 'm42', 'nebula', 'The Orion Nebula, a diffuse nebula situated in the Milky Way.'),
-    (10, 'crab nebula', 'nebula', 'Supernova remnant in the constellation Taurus.'),
-    (11, 'Ganymede', 'moon', 'Jupiters largest moon'),
-    (12, 'm13', 'star cluster', 'Globular cluster in the Hercules constellation.'),
-    (13, 'mars', 'planet', 'Fourth planet from the Sun, often referred to as the Red Planet.'),
-    (14, 'bee-hive cluster', 'star cluster', 'Open cluster in the constellation Cancer.'),
-    (15, 'andromeda iii', 'galaxy', 'Dwarf galaxy in the Andromeda Galaxy subgroup.')
-    (16, 'moon', 'moon', 'Earths moon');
+    (9, 'crab nebula', 'nebula', 'Supernova remnant in the constellation Taurus.'),
+    (10, 'Ganymede', 'moon', 'Jupiters largest moon'),
+    (11, 'moon', 'moon', 'Earths moon');
 
 create table events (
     event_id int not null primary key,
@@ -103,7 +98,7 @@ INSERT INTO earth_locations (earth_location_id, quadrant, latitude, longitude, t
     (3, 'NE', 51.5074, -0.1278, 'UTC+0', '2023-10-15 20:00:00', 'London, UK'),
     (4, 'SE', 33.4484, -112.0740, 'UTC-7', '2023-10-15 13:00:00', 'Phoenix, USA'),
     (5, 'NW', 41.8781, -87.6298, 'UTC-5', '2023-10-15 15:00:00', 'Chicago, USA'),
-    (6, 'SE', -23.5505, -46.6333, 'UTC-3', '2023-10-15 14:00:00', 'São Paulo, Brazil'),
+    (6, 'SE', -23.5505, -46.6333, 'UTC-3', '2023-10-15 14:00:00', 'Sao Paulo, Brazil'),
     (7, 'NE', 55.7558, 37.6176, 'UTC+3', '2023-10-15 21:00:00', 'Moscow, Russia'),
     (8, 'SW', -33.8688, 151.2093, 'UTC+11', '2023-10-16 01:00:00', 'Sydney, Australia'),
     (9, 'NW', 48.8566, 2.3522, 'UTC+1', '2023-10-15 17:00:00', 'Paris, France');
@@ -111,20 +106,18 @@ INSERT INTO earth_locations (earth_location_id, quadrant, latitude, longitude, t
 create table space_locations (
     space_location_id int not null primary key,
     ra time not null,
-    de varchar(255) not null
+    de varchar(255) not null,
+    description varchar(255)
 );
 
-INSERT INTO space_locations (space_location_id, ra, de) VALUES
-    (1, '00:42:44', '+41° 16'' 09"'),
-    (2, '05:35:17', '-05° 23'' 28"'),
-    (3, '20:22:38', '-18° 40'' 48"'),
-    (4, '03:47:24', '+24° 07'' 00"'),
-    (5, '05:41:02', '-02° 27'' 30"'),
-    (6, '08:00:12', '+15° 45'' 36"'),  -- Example 1
-    (7, '12:30:55', '-10° 12'' 15"'), -- Example 2
-    (8, '18:55:20', '-32° 18'' 02"'), -- Example 3
-    (9, '22:15:33', '+02° 50'' 20"'), -- Example 4
-    (10, '02:10:08', '-45° 30'' 55"'); -- Example 5
+INSERT INTO space_locations (space_location_id, ra, de, description) VALUES
+    (1, '00:42:44', '+41° 16'' 09"', 'Constellation Andromeda'),
+    (2, '05:35:17', '-05° 23'' 28"', 'Constellation Taurus'),
+    (3, '20:22:38', '-18° 40'' 48"', 'Center of the Milky Way'),
+    (4, '05:41:02', '-02° 27'' 30"', 'Constellation Orion'),
+    (5, '12:30:55', '-10° 12'' 15"', 'Constellation Virgo'),
+    (6, '22:15:33', '+02° 50'' 20"', 'Constellation Aquarius'),
+    (7, '21:04:10', '-15° 36'' 22"', 'Constellation Capricornus');
 
 CREATE TABLE object_event (
     id int auto_increment,
@@ -202,11 +195,11 @@ CREATE TABLE object_object (
 INSERT INTO object_event (object_id, event_id)
 VALUES
     (5, 6), -- sol and total solar eclipse
-    (11 , 1), -- total lunar eclipse
+    (10, 1), -- total lunar eclipse
     (8, 5), -- Saturn and Planetary Conjunction
     (3, 5), -- jupiter and Planetary Conjunction
     (4, 2), -- Star Cluster and Meteor Shower
-    (16, 7), -- super blue moon
+    (11, 7), -- super blue moon
     (5, 1); -- supernova
 
 INSERT INTO event_location (event_id, location_id)
@@ -215,31 +208,76 @@ VALUES
     (2, 2), -- Meteor Shower in San Francisco
     (3, 3), -- comet Sighting Miami
     (4, 4), -- supernova Observation Los Angeles
-    (5, 5); -- planetary conj philly
+    (5, 5), -- planetary conj philly
     (7, 9); -- super blue moon paris
+
 
 INSERT INTO object_location (object_id, location_id)
 VALUES
-    (1, 4),  -- Andromeda Galaxy in LA
-    (2, 2),  -- Orion Nebula in San Francisco
-    (5, 3),  -- Jupiter in London
-    (8, 3),  -- Saturn in London
-    (5, 5),  -- Horsehead Nebula in Chicago
-    (16, 9) -- moon paris
+    (1, 5),
+    (2, 1),
+    (3, 6),
+    (4, 4),
+    (5, 2),
+    (6, 3),
+    (7, 9),
+    (8, 8),
+    (9, 7),
+    (10, 5),
+    (11, 2);
 
 INSERT INTO object_space_location (object_id, space_location_id)
-SELECT o.object_id, sl.space_location_id
-FROM objects o, space_locations sl;
+VALUES
+    (1, 1),   -- Andromeda Galaxy - Constellation Andromeda
+    (2, 4),   -- Orion is in Orion
+    (3, 6),   -- Jupiter - Center of the Milky Way - Constellation Aquarius
+    (4, 2),   -- pleidas star cluster - taurus
+    (5, 3),   -- sun -- center 
+    (6, 4),   -- horse nebula is in orion
+    (7, 1),   -- andromeda 2 - andromeda
+    (8, 7),   -- saturn - Constellation capricornus
+    (9, 2), -- crab nebula - taurus
+    (10, 6), -- ganymede -- 
+    (11, 5); -- our moon -- virgo as of right now 12/9/2023
 
 INSERT INTO observer_event (observer_id, event_id)
-SELECT obs.observer_id, e.event_id
-FROM observers obs, events e;
+VALUES
+    (1, 1),
+    (2, 2),
+    (3, 3),
+    (4, 4),
+    (5, 5),
+    (6, 6),
+    (7, 7),
+    (8, 8),
+    (9, 9),
+    (10, 5),
+    (11, 1),
+    (12, 3),
+    (13, 7),
+    (14, 8),
+    (15, 9);
+
 
 INSERT INTO observer_object (observer_id, object_id)
-SELECT obs.observer_id, o.object_id
-FROM observers obs, objects o;
+VALUES
+    (1, 3),
+    (2, 4),
+    (3, 2),
+    (4, 1),
+    (5, 10),
+    (6, 9),
+    (7, 7),
+    (8, 6),
+    (9, 8),
+    (10, 1),
+    (11, 4),
+    (12, 5),
+    (13, 2),
+    (14, 3),
+    (15, 11);
 
 INSERT INTO object_object (object1_id, object2_id)
-SELECT o1.object_id, o2.object_id
-FROM objects o1, objects o2
-WHERE o1.object_id < o2.object_id;
+VALUES
+  (3, 8);
+  
