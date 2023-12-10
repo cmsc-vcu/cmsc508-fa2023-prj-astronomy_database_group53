@@ -3517,13 +3517,19 @@ erDiagram
 <ul>
 <li>We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.</li>
 </ul>
-<dl>
-<dt><span style="color:#a074c1;"><strong>Relational schemas</strong></span></dt>
-<dd>
-Below are our database’s tables
-</dd>
-</dl>
-<p><strong>Objects</strong></p>
+<p><span style="color:#a074c1;"><strong>Our Tables - BCNF Showcase</strong></span></p>
+<ul>
+<li>(you can tab through them)</li>
+<li>All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.</li>
+</ul>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href>Objects</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href>Event</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href>Observer</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href>Earth Location</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href>Space Locations</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p><strong><span class="math inline">\(R_{0}\)</span></strong>, objects, has functional dependency</p>
+<ul>
+<li>object_id <span class="math inline">\(\rightarrow\)</span> object_name, type, description</li>
+</ul>
 <div class="cell" data-execution_count="5">
 <div class="cell-output cell-output-display" data-execution_count="21">
 <div>
@@ -3623,7 +3629,12 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p><strong>Event</strong></p>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p><strong><span class="math inline">\(R_{1}\)</span></strong>, events, has functional dependencies</p>
+<ul>
+<li>event_id <span class="math inline">\(\rightarrow\)</span> event_name, date_occurred, duration, frequency</li>
+</ul>
 <div class="cell" data-execution_count="6">
 <div class="cell-output cell-output-display" data-execution_count="22">
 <div>
@@ -3719,7 +3730,12 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p><strong>Observer</strong></p>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p><strong><span class="math inline">\(R_{3}\)</span></strong>, observers, has functional dependency</p>
+<ul>
+<li>observer_id <span class="math inline">\(\rightarrow\)</span> first_name, last_name</li>
+</ul>
 <div class="cell" data-execution_count="7">
 <div class="cell-output cell-output-display" data-execution_count="23">
 <div>
@@ -3831,7 +3847,12 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p><strong>Earth Location</strong></p>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<p><strong><span class="math inline">\(R_{4}\)</span></strong>, earth_locations, has functional dependencies</p>
+<ul>
+<li>earth_location_id <span class="math inline">\(\rightarrow\)</span> quadrant, latitude, longitude, timezone, local_time, description</li>
+</ul>
 <div class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display" data-execution_count="24">
 <div>
@@ -3947,7 +3968,12 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p><strong>Space Locations</strong></p>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<p><strong><span class="math inline">\(R_{4}\)</span></strong>, space_locations, has functional dependency</p>
+<ul>
+<li>space_location_id <span class="math inline">\(\rightarrow\)</span> ra, de, description</li>
+</ul>
 <div class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display" data-execution_count="25">
 <div>
@@ -4019,7 +4045,19 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Object-Event **</p>
+</div>
+</div>
+</div>
+<p><span style="color:#a074c1;"><strong>Our Associative Tables</strong></span></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href>Object-Event</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href>Object-Location</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href>Object-Space Location</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href>Object-Object</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href>Event-Location</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false" href>Observer-Event</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false" href>Observer-Object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<ul>
+<li><p>Containing the event_id, the object_id, and the date. One event_id can be related to multiple object_id’s, but does not need to be related to any.</p></li>
+<li><p>Candidate Key: <code>{object_id, event_id}</code></p></li>
+<li><p>Functional Dependency: <code>object_id, event_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="10">
 <div class="cell-output cell-output-display" data-execution_count="26">
 <div>
@@ -4083,7 +4121,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Object-Location **</p>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<ul>
+<li><p>Containing the object_id, the location_id. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times.</p></li>
+<li><p>Candidate Key: <code>{object_id, location_id}</code></p></li>
+<li><p>Functional Dependency: <code>object_id, location_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="11">
 <div class="cell-output cell-output-display" data-execution_count="27">
 <div>
@@ -4171,7 +4215,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Object-Space Location **</p>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<ul>
+<li><p>Containing the space_location_id, object_id. The object has to have at least one location in space.</p></li>
+<li><p>Candidate Key: <code>{object_id, cel_location_id}</code></p></li>
+<li><p>Functional Dependency: <code>object_id, cel_location_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="12">
 <div class="cell-output cell-output-display" data-execution_count="28">
 <div>
@@ -4259,7 +4309,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Object-Object **</p>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<ul>
+<li><p>Contains 2 object_id’s. Used for cases like planets with moons, planetary conjunctions. One object can have 0 or more objects related to it.</p></li>
+<li><p>Candidate Key: <code>{object_id, related_object_id}</code></p></li>
+<li><p>Functional Dependency: `object_id, related_object_id+</p></li>
+</ul>
 <div class="cell" data-execution_count="13">
 <div class="cell-output cell-output-display" data-execution_count="29">
 <div>
@@ -4287,7 +4343,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Event-Location **</p>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<ul>
+<li><p>Containing the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.</p></li>
+<li><p>Candidate Key: <code>{event_id, location_id}</code></p></li>
+<li><p>Functional Dependency: <code>event_id, location_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="14">
 <div class="cell-output cell-output-display" data-execution_count="30">
 <div>
@@ -4345,7 +4407,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Observer-Event **</p>
+</div>
+<div id="tabset-2-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-6-tab">
+<ul>
+<li><p>Contains the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.</p></li>
+<li><p>Candidate Key: <code>{observer_id, event_id}</code></p></li>
+<li><p>Functional Dependency: <code>observer_id, event_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="15">
 <div class="cell-output cell-output-display" data-execution_count="31">
 <div>
@@ -4457,7 +4525,13 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>** Observer-Object **</p>
+</div>
+<div id="tabset-2-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-7-tab">
+<ul>
+<li><p>Contains the observer_id and the object_id. An observer must discover at least one object, and can discover multiple.</p></li>
+<li><p>Candidate Key: <code>{observer_id, object_id}</code></p></li>
+<li><p>Functional Dependency: <code>observer_id, object_id → date</code></p></li>
+</ul>
 <div class="cell" data-execution_count="16">
 <div class="cell-output cell-output-display" data-execution_count="32">
 <div>
@@ -4569,161 +4643,175 @@ Below are our database’s tables
 </div>
 </div>
 </div>
-<p>Hopefully, using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events.</p>
-<p>Below is a list of relationships:</p>
-<ul>
-<li><p><strong>CelestialObject-Event</strong>: containing the event_id, the object_id, and the date. One event_id can be related to multiple object_id’s, but does not need to be related to any.</p></li>
-<li><p><strong>Event-Location</strong>: containing the event_id, the location_id, and the date. Some events can be seen from multiple locations. Not all events can be viewed from the same location at two different times, so date is important.</p></li>
-<li><p><strong>CelestialObject-Location</strong>: containing the event_id, the location_id, and the date. Some objects can be seen from multiple locations. Not all objects can be viewed from the same location at two different times, so date is important.</p></li>
-<li><p><strong>CelestialObject-CelestialLocation</strong>: containing the cel_location_id, object_id, and date. Different types of objects move at different rates, so, based on the date of the last location of an obect, a new entry should be added.</p></li>
-<li><p><strong>Observer-Event</strong>: contains the observer_id, the event_id, and date. An observer must discover at least one event, and can discover multiple.</p></li>
-<li><p><strong>Observer-CelestialObject</strong>: contains the observer_id, the event_id, and date. An observer must discover at least one object, and can discover multiple.</p></li>
-<li><p><strong>CelestialObject-CelestialObject</strong>: contains 2 object_id’s. Used for cases like planets with moons, or galaxies with planets. One object can have 0 or more objects related to it.</p></li>
-</ul>
-<p><span style="color:#a074c1;"><strong>BCNF</strong></span></p>
-<p><strong><span class="math inline">\(R_{0}\)</span></strong>, CelestialObject, has functional dependency</p>
-<ul>
-<li>object_id <span class="math inline">\(\rightarrow\)</span> object_name, object_type, description</li>
-</ul>
-<p><strong><span class="math inline">\(R_{1}\)</span></strong>, Event, has functional dependencies</p>
-<ul>
-<li>event_id <span class="math inline">\(\rightarrow\)</span> event_name, date, duration, frequency</li>
-<li>event_name <span class="math inline">\(\rightarrow\)</span> duration, frequency</li>
-</ul>
-<p><strong><span class="math inline">\(R_{3}\)</span></strong>, Observer, has functional dependency</p>
-<ul>
-<li>observer_id <span class="math inline">\(\rightarrow\)</span> first_name, last_name</li>
-</ul>
-<p><strong><span class="math inline">\(R_{4}\)</span></strong>, EarthLocation, has functional dependencies</p>
-<ul>
-<li>location_id <span class="math inline">\(\rightarrow\)</span> quadrant, longitude, latitude, timezone, local_time</li>
-<li>longiude, latitude <span class="math inline">\(\rightarrow\)</span> quadrant, timezone</li>
-</ul>
-<p><strong><span class="math inline">\(R_{4}\)</span></strong>, CelestialLocation, has functional dependency</p>
-<ul>
-<li>cel_location_id <span class="math inline">\(\rightarrow\)</span> RA, Dec</li>
-</ul>
-<ol type="1">
-<li><strong>CelestialObject-Event</strong>:
-<ul>
-<li>Candidate Key: <code>{object_id, event_id}</code></li>
-<li>Functional Dependency: <code>object_id, event_id → date</code></li>
-</ul></li>
-<li><strong>Event-Location</strong>:
-<ul>
-<li>Candidate Key: <code>{event_id, location_id}</code></li>
-<li>Functional Dependency: <code>event_id, location_id → date</code></li>
-</ul></li>
-<li><strong>CelestialObject-Location</strong>:
-<ul>
-<li>Candidate Key: <code>{object_id, location_id}</code></li>
-<li>Functional Dependency: <code>object_id, location_id → date</code></li>
-</ul></li>
-<li><strong>CelestialObject-CelestialLocation</strong>:
-<ul>
-<li>Candidate Key: <code>{object_id, cel_location_id}</code></li>
-<li>Functional Dependency: <code>object_id, cel_location_id → date</code></li>
-</ul></li>
-<li><strong>Observer-Event</strong>:
-<ul>
-<li>Candidate Key: <code>{observer_id, event_id}</code></li>
-<li>Functional Dependency: <code>observer_id, event_id → date</code></li>
-</ul></li>
-<li><strong>Observer-CelestialObject</strong>:
-<ul>
-<li>Candidate Key: <code>{observer_id, object_id}</code></li>
-<li>Functional Dependency: <code>observer_id, object_id → date</code></li>
-</ul></li>
-<li><strong>CelestialObject-CelestialObject</strong>:
-<ul>
-<li>Candidate Key: <code>{object_id, related_object_id}</code></li>
-<li>Functional Dependency: `object_id, related_object_id+</li>
-</ul></li>
-</ol>
-<p>All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.</p>
+</div>
+</div>
+</div>
 <p><span style="color:#a074c1;"><strong>Queries</strong></span></p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href>1</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href>2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href>3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false" href>4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false" href>5</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false" href>6</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-7" role="tab" aria-controls="tabset-3-7" aria-selected="false" href>7</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-8" role="tab" aria-controls="tabset-3-8" aria-selected="false" href>8</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-9" role="tab" aria-controls="tabset-3-9" aria-selected="false" href>9</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-10-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-10" role="tab" aria-controls="tabset-3-10" aria-selected="false" href>10</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-11-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-11" role="tab" aria-controls="tabset-3-11" aria-selected="false" href>11</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-12-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-12" role="tab" aria-controls="tabset-3-12" aria-selected="false" href>12</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-13-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-13" role="tab" aria-controls="tabset-3-13" aria-selected="false" href>13</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-14-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-14" role="tab" aria-controls="tabset-3-14" aria-selected="false" href>14</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-15-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-15" role="tab" aria-controls="tabset-3-15" aria-selected="false" href>15</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-16-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-16" role="tab" aria-controls="tabset-3-16" aria-selected="false" href>16</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-17-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-17" role="tab" aria-controls="tabset-3-17" aria-selected="false" href>17</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-18-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-18" role="tab" aria-controls="tabset-3-18" aria-selected="false" href>18</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-19-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-19" role="tab" aria-controls="tabset-3-19" aria-selected="false" href>19</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-20-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-20" role="tab" aria-controls="tabset-3-20" aria-selected="false" href>20</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <ol type="1">
 <li><p><strong>Retrieve names and descriptions of celestial objects visible from a specific location.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name, description}(\sigma_{location\_id = X}(CelestialObject-Location))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<ol start="2" type="1">
 <li><p><strong>Find upcoming celestial events for a given location.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{location\_id = X}(Event-Location))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<ol start="3" type="1">
 <li><p><strong>Identify celestial objects discovered by a specific observer.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name}(\sigma_{observer\_id = X}(Observer-CelestialObject))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-4-tab">
+<ol start="4" type="1">
 <li><p><strong>List all celestial events related to a specific celestial object.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name}(\sigma_{object\_id = X}(CelestialObject-Event))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
+<ol start="5" type="1">
 <li><p><strong>Find the celestial objects with specific characteristics (e.g., galaxies, stars).</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name}(\sigma_{object\_type = &quot;Galaxy&quot; \land X)}(CelestialObject)\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
+<ol start="6" type="1">
 <li><p><strong>Retrieve the celestial objects observed from a given quadrant.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name}(\sigma_{quadrant = &quot;NW&quot;}(EarthLocation \Join CelestialObject-Location \Join CelestialObject))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-7-tab">
+<ol start="7" type="1">
 <li><p><strong>Find events on a specific date.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(Event))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-8-tab">
+<ol start="8" type="1">
 <li><p><strong>Get details about celestial locations.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{RA, Dec}(\sigma_{cel\_location\_id = X}(CelestialLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-9-tab">
+<ol start="9" type="1">
 <li><p><strong>List celestial objects linked to other celestial objects.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-10-tab">
+<ol start="10" type="1">
 <li><p><strong>Find the observers who discovered a specific celestial object.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{first\_name, last_name}(\sigma_{object\_id = X}(Observer-CelestialObject))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-11-tab">
+<ol start="11" type="1">
 <li><p><strong>Plan a stargazing session by retrieving the celestial objects visible from a specific location and their altitudes.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name, altitude}(\sigma_{location\_id = X}(CelestialObject-Location \Join CelestialLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-12-tab">
+<ol start="12" type="1">
 <li><p><strong>Identify the best time to observe a particular celestial event, considering the location’s time zone (UTC).</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-13" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-13-tab">
+<ol start="13" type="1">
 <li><p><strong>Explore details about the celestial objects discovered by a specific observer, including their descriptions.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-CelestialObject \Join CelestialObject))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-14" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-14-tab">
+<ol start="14" type="1">
 <li><p><strong>Find information about upcoming meteor showers, specifically where and when they can be observed.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_name = &quot;Meteor Shower&quot;}(Event-Location))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-15" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-15-tab">
+<ol start="15" type="1">
 <li><p><strong>Locate celestial objects of a particular type (e.g., planets) visible from a specific quadrant.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name}(\sigma_{object\_type = &quot;Planet&quot; \land quadrant = &quot;NW&quot;}(CelestialObject \Join CelestialObject-Location \Join EarthLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-16" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-16-tab">
+<ol start="16" type="1">
 <li><p><strong>Discover the celestial events scheduled for a specific date and their locations.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name, location\_id}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(Event-Location))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-17" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-17-tab">
+<ol start="17" type="1">
 <li><p><strong>Determine the celestial objects with the highest altitudes at a given time.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name, altitude}(\sigma_{date = &quot;YYYY-MM-DD&quot;}(CelestialObject-Location \Join CelestialLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-18" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-18-tab">
+<ol start="18" type="1">
 <li><p><strong>Explore details about a specific celestial location, such as RA and Dec.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join CelestialObject-Location \Join CelestialLocation))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-19" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-19-tab">
+<ol start="19" type="1">
 <li><p><strong>Find celestial events with unique characteristics (e.g., total solar eclipses) and their dates.</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{event\_name, date}(\sigma_{event\_name = &quot;Total Solar Eclipse&quot;}(Event-Location))\)</span></li>
 </ul></li>
+</ol>
+</div>
+<div id="tabset-3-20" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-20-tab">
+<ol start="20" type="1">
 <li><p><strong>Discover celestial objects with unusual relationships (e.g., moons of specific planets).</strong></p>
 <ul>
 <li><span class="math inline">\(\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))\)</span></li>
 </ul></li>
 </ol>
+</div>
+</div>
+</div>
 </section>
 <section id="project-management" class="level4">
 <h4 class="anchored" data-anchor-id="project-management">Project Management</h4>
@@ -4746,13 +4834,23 @@ gantt
         Status Report :a3, 2023-11-10, 7d
         Finishing Touches :a4, 2023-11-27, 15d
         Final Report :2023-12-05, 7d
-
         
 </pre>
 </div>
 </div>
 </div>
 </div>
+</section>
+<section id="reflection" class="level3">
+<h3 class="anchored" data-anchor-id="reflection">Reflection</h3>
+<p><strong>Astronomy Engine</strong></p>
+<ul>
+<li>Using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events. However, we did not allocate enough time to implement this additional feature to our project. This is something we could look into implementing as our own side project.</li>
+</ul>
+<p><strong>Accurate Astronomy Database</strong></p>
+<ul>
+<li>Our data individually is all realistic other, however, the relations are not necessairly accurate. We just went table by table to find data. The links between each item are much more time intensive. For example, we did not look to see whether y planet can be from x location</li>
+</ul>
 </section>
 
 </main>
