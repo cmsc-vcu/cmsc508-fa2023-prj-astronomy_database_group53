@@ -35,7 +35,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return "welcome"
+    return jsonify({
+        'message' : 'Welcome to the Astronomy Database API!'
+    })
 
 @app.route('/observers', methods=['GET'])
 def show_observers():
@@ -53,12 +55,15 @@ def show_observers():
     sql = "select * from observers"
 
     # add filters based on the provided query parameters
-    if first_name and last_name:
-        sql += f" where first_name = '{first_name}' and last_name = '{last_name}'"
-    elif first_name:
-        sql += f" where first_name = '{first_name}'"
-    elif last_name:
-        sql += f" where last_name = '{last_name}'"
+    conditions = []
+    if first_name:
+        conditions.append(f" first_name = '{first_name}'")
+    if last_name:
+        conditions.append(f" last_name = '{last_name}'")
+
+    # constructing the where clause
+    if conditions:
+        sql += " where" + " and".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -93,7 +98,7 @@ def show_observers():
     if observers is not None:
         return jsonify(observers)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : 'Failed to fetch observers'}), 500
 
 @app.route(f'/observer/<int:id>', methods=['GET'])
 def show_observer(id):
@@ -122,7 +127,33 @@ def show_observer(id):
             'last_name' : df['last_name'][0]
         })
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : f'Failed to fetch observer {id}'}), 500
+    
+@app.route('/observers/add', methods=['POST'])
+def add_observer():
+    data = request.get_json()
+    if not data:
+        return jsonify({'message' : 'No data provided.'}), 400
+    
+    observer_id = data.get('observer_id')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+
+    if not observer_id or not first_name or not last_name:
+        return jsonify({'message': 'Missing required fields'}), 400
+    
+    # db connection
+    cnx = db_connection()
+
+    # Insert the new observer into the database
+    try:
+        sql = "insert into observers (observer_id, first_name, last_name) values (%s, %s, %s)"
+        df = pd.read_sql(sql, cnx)
+        return jsonify({'message': 'Observer added successfully'}), 201
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to add observer'}), 500
 
 @app.route('/events', methods=['GET'])
 def show_events():
@@ -130,6 +161,10 @@ def show_events():
     cnx = db_connection()
 
     # get query parameters from URL
+    name = request.args.get('name')
+    date = request.args.get('date')
+    duration = request.args.get('duration')
+    frequency = request.args.get('frequency')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
@@ -138,6 +173,20 @@ def show_events():
     sql = "select * from events"
 
     # add filters based on the provided query parameters
+    conditions = []
+    if name:
+        conditions.append(f" event_name = '{name}'")
+    if date:
+        conditions.append(f" date_occurred = '{date}'")
+    if duration:
+        conditions.append(f" duration = '{duration}'")
+    if frequency:
+        conditions.append(f" frequency = '{frequency}'")
+
+    # constructing the where clause
+    if conditions:
+        sql += " where" + " and".join(conditions)
+
     if sort_by:
         sql += f" order by {sort_by}"
         if order_by:
@@ -178,7 +227,7 @@ def show_events():
     if events is not None:
         return jsonify(events)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : 'Failed to fetch events'}), 500
 
 @app.route('/event/<int:id>', methods=['GET'])
 def show_event(id):
@@ -209,7 +258,7 @@ def show_event(id):
             'frequency' : df['frequency'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch observer {id}'})
+        return jsonify({'message' : f'Failed to fetch event {id}'}), 500
 
 @app.route('/objects', methods=['GET'])
 def show_objects():
@@ -217,14 +266,26 @@ def show_objects():
     cnx = db_connection()
 
     # get query parameters from URL
+    name = request.args.get('object_name')
+    type = request.args.get('type')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
     # query database
     sql = "select * from objects"
-
+    
     # add filters based on the provided query parameters
+    conditions = []
+    if name:
+        conditions.append(f" event_name = '{name}'")
+    if type:
+        conditions.append(f" type = '{type}'")
+
+    # constructing the where clause
+    if conditions:
+        sql += " where" + " and".join(conditions)
+
     if sort_by:
         sql += f" order by {sort_by}"
         if order_by:
@@ -253,8 +314,8 @@ def show_objects():
         name = df['object_name'][i]
         type = df['type'][i]
         description = df['description'][i]
-        object['observer_id'] = id
-        object['name'] = name
+        object['object_id'] = id
+        object['object_name'] = name
         object['type'] = type
         object['description'] = description
         objects.append(object)
@@ -264,7 +325,7 @@ def show_objects():
     if objects is not None:
         return jsonify(objects)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : 'Failed to fetch objects'}), 500
 
 @app.route('/object/<int:id>', methods=['GET'])
 def show_object(id):
@@ -294,7 +355,7 @@ def show_object(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : f'Failed to fetch object {id}'}), 500
 
 @app.route('/earth_locations', methods=['GET'])
 def show_earth_locations():
@@ -302,6 +363,11 @@ def show_earth_locations():
     cnx = db_connection()
 
     # get query parameters from URL
+    quad = request.args.get('quadrant')
+    lat = request.args.get('latitude')
+    long = request.args.get('longitude')
+    timezone = request.args.get('timezone')
+    time = request.args.get('local_time')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
@@ -310,6 +376,22 @@ def show_earth_locations():
     sql = "select * from earth_locations"
 
     # add filters based on the provided query parameters
+    conditions = []
+    if quad:
+        conditions.append(f" quadrant = '{quad}'")
+    if lat:
+        conditions.append(f" latitude = '{lat}'")
+    if long:
+        conditions.append(f" longitude = '{long}'")
+    if timezone:
+        conditions.append(f" timezone = '{timezone}'")
+    if time:
+        conditions.append(f" local_time = '{time}'")
+
+    # constructing the where clause
+    if conditions:
+        sql += " where" + " and".join(conditions)
+
     if sort_by:
         sql += f" order by {sort_by}"
         if order_by:
@@ -320,7 +402,7 @@ def show_earth_locations():
         page = request.args.get('page', default=1, type=int)
         if page > 1:
             sql += f" offset {per_page * (page - 1)}"
-            
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -355,7 +437,7 @@ def show_earth_locations():
     if locations is not None:
         return jsonify(locations)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : 'Failed to fetch Earth locations'}), 500
 
 @app.route('/earth_location/<int:id>', methods=['GET'])
 def show_earth_location(id):
@@ -388,7 +470,7 @@ def show_earth_location(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : f'Failed to fetch Earth location {id}'}), 500
 
 @app.route('/space_locations', methods=['GET'])
 def show_space_locations():
@@ -396,6 +478,8 @@ def show_space_locations():
     cnx = db_connection()
 
     # get query parameters from URL
+    ra = request.args.get('ra')
+    de = request.args.get('de')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
@@ -404,6 +488,16 @@ def show_space_locations():
     sql = "select * from space_locations"
 
     # add filters based on the provided query parameters
+    conditions = []
+    if ra:
+        conditions.append(f" ra = '{ra}'")
+    if de:
+        conditions.append(f" de = '{de}'")
+
+    # constructing the where clause
+    if conditions:
+        sql += " where" + " and".join(conditions)
+
     if sort_by:
         sql += f" order by {sort_by}"
         if order_by:
@@ -450,7 +544,7 @@ def show_space_locations():
     if locations is not None:
         return jsonify(locations)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : 'Failed to fetch space locations'}), 500
 
 @app.route('/space_location/<int:id>', methods=['GET'])
 def show_space_location(id):
@@ -486,7 +580,7 @@ def show_space_location(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : 'Failed to fetch observers'})
+        return jsonify({'message' : f'Failed to fetch space location {id}'}), 500
 
 if __name__ == "__main__":
     app.run()
