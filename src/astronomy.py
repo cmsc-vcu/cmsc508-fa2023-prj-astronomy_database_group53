@@ -42,10 +42,35 @@ def show_observers():
     # db connection
     cnx = db_connection()
 
-    #query database
-    sql= f"""
-    select * from observers
-    """
+    # get query parameters from URL
+    first_name = request.args.get('first_name')
+    last_name = request.args.get('last_name')
+    sort_by = request.args.get('sort_by')
+    order_by = request.args.get('order_by')
+    per_page = request.args.get('per_page')
+
+    # query database
+    sql = "select * from observers"
+
+    # add filters based on the provided query parameters
+    if first_name and last_name:
+        sql += f" where first_name = '{first_name}' and last_name = '{last_name}'"
+    elif first_name:
+        sql += f" where first_name = '{first_name}'"
+    elif last_name:
+        sql += f" where last_name = '{last_name}'"
+
+    if sort_by:
+        sql += f" order by {sort_by}"
+        if order_by:
+            sql += f" {order_by}"
+
+    if per_page:
+        sql += f" limit {per_page}"
+        page = request.args.get('page', default=1, type=int)
+        if page > 1:
+            sql += f" offset {per_page * (page - 1)}"
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -66,7 +91,7 @@ def show_observers():
 
     # if data exists, return it is JSON
     if observers is not None:
-        return observers
+        return jsonify(observers)
     else:
         return jsonify({'message' : 'Failed to fetch observers'})
 
@@ -364,7 +389,6 @@ def show_space_locations():
     else:
         return jsonify({'message' : 'Failed to fetch observers'})
 
-#TODO: creates an error: Object of type Timedelta is not JSON serializable
 @app.route('/space_location/<int:id>', methods=['GET'])
 def show_space_location(id):
     # db connection
