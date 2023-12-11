@@ -112,9 +112,8 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
 import requests
 from flask import Flask
-sys.path.append('cmsc508-fa2023-prj-astronomy_database_group53/src') 
 import json
-from src.test_client import *
+from events import get_events
 from IPython.display import display, Markdown, HTML
 
 app = Flask(__name__)
@@ -1097,12 +1096,13 @@ df
 
 ## Astronomy API
 * Our API was made in the astronomy.py file using flask
-* Our client.py defines functions to easily utilize our endpoints for basic tasks involving the API
+* Our test_client.py defines functions to easily utilize our endpoints for basic tasks involving the API
 
 **Endpoints**
 # Observers
 1. get all observers
 * query parameters: first_name, last_name, sort_by, order_by, per_page
+
 2. get observer(id)
 3. observer add(id, first_name, last_name)
 4. remove observer(id)
@@ -1131,8 +1131,10 @@ df
 
 1. Basic API Request:
 ```{python}
+    app = Flask(__name__)
+    header = {'Authorization' : 'Bearer super-secret'}
 
-    response = requests.get('http://localhost:5000/events')
+    response = requests.get('http://localhost:5000/events', headers=header)
 
 ```
 
