@@ -110,9 +110,15 @@ from tabulate import tabulate
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from IPython.display import display, Markdown
-from src.client import *
+import requests
+from flask import Flask
+sys.path.append('cmsc508-fa2023-prj-astronomy_database_group53/src') 
+import json
+from src.test_client import *
+from IPython.display import display, Markdown, HTML
 
+app = Flask(__name__)
+header = {'Authorization' :'Bearer super-secret'}
 ```
 
 ```{python}
