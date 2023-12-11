@@ -94,11 +94,12 @@ def show_observers():
         observer['last_name'] = df['last_name'][i]
         observers.append(observer)
 
+
     # if data exists, return it is JSON
     if observers is not None:
         return jsonify(observers)
     else:
-        return jsonify({'message' : 'Failed to fetch observers'}), 500
+        return jsonify({'message' : 'Failed to find observers.'}), 404
 
 @app.route(f'/observer/<int:id>', methods=['GET'])
 def show_observer(id):
@@ -127,11 +128,12 @@ def show_observer(id):
             'last_name' : df['last_name'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch observer {id}'}), 500
+        return jsonify({'message' : f'Failed to find observer {id}'}), 404
     
 @app.route('/observers/add', methods=['POST'])
 def add_observer():
     data = request.get_json()
+
     if not data:
         return jsonify({'message' : 'No data provided.'}), 400
     
@@ -139,21 +141,26 @@ def add_observer():
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
+    df = pd.DataFrame({
+        'observer_id' : [observer_id],
+        'first_name' : [first_name],
+        'last_name' : [last_name]
+    })
+    
     if not observer_id or not first_name or not last_name:
-        return jsonify({'message': 'Missing required fields'}), 400
+        return jsonify({'message': 'Missing required fields.'}), 400
     
     # db connection
     cnx = db_connection()
 
     # Insert the new observer into the database
     try:
-        sql = "insert into observers (observer_id, first_name, last_name) values (%s, %s, %s)"
-        df = pd.read_sql(sql, cnx)
-        return jsonify({'message': 'Observer added successfully'}), 201
+        df.to_sql('observers', con=cnx, if_exists='append', index=False)
+        return jsonify({'message': 'Observer added successfully.'}), 201
     except Exception as e:
         message = str(e)
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add observer'}), 500
+        return jsonify({'message': 'Failed to add observer.'}), 500
 
 @app.route('/events', methods=['GET'])
 def show_events():
@@ -197,6 +204,7 @@ def show_events():
         page = request.args.get('page', default=1, type=int)
         if page > 1:
             sql += f" offset {per_page * (page - 1)}"
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -227,7 +235,7 @@ def show_events():
     if events is not None:
         return jsonify(events)
     else:
-        return jsonify({'message' : 'Failed to fetch events'}), 500
+        return jsonify({'message' : 'Failed to find events'}), 404
 
 @app.route('/event/<int:id>', methods=['GET'])
 def show_event(id):
@@ -239,6 +247,7 @@ def show_event(id):
     select * from events
     where event_id={id}
     """
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -258,7 +267,43 @@ def show_event(id):
             'frequency' : df['frequency'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch event {id}'}), 500
+        return jsonify({'message' : f'Failed to find event {id}'}), 404
+
+@app.route('/events/add', methods=['POST'])
+def add_event():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'No data provided.'}), 400
+    
+    event_id = data.get('event_id')
+    event_name = data.get('event_name')
+    date_occurred = data.get('date_occurred')
+    duration = data.get('duration')
+    frequency = data.get('duration')
+
+    df = pd.DataFrame[{
+        'event_id' : [event_id],
+        'event_name' : [event_name],
+        'date_occurred' : [date_occurred],
+        'duration' : [duration],
+        'frequency' : [frequency]
+    }]
+
+    if not event_id or not event_name or not date_occurred:
+        return jsonify({'message': 'Missing required fields.'}), 400
+    
+    # db connection
+    cnx = db_connection()
+
+    # Insert the new event into the database
+    try:
+        df.to_sql('events', con=cnx, if_exists='append', index=False)
+        return jsonify({'message': 'Event added successfully.'}), 201
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to add event.'}), 500
 
 @app.route('/objects', methods=['GET'])
 def show_objects():
@@ -307,25 +352,26 @@ def show_objects():
     # format data returned
     df = df.to_dict()
     objects = []
-    i = 0
-    while i < len(df['object_id']):
-        object = {}
-        id = df['object_id'][i]
-        name = df['object_name'][i]
-        type = df['type'][i]
-        description = df['description'][i]
-        object['object_id'] = id
-        object['object_name'] = name
-        object['type'] = type
-        object['description'] = description
-        objects.append(object)
-        i = i + 1
+    if df is not None:
+        i = 0
+        while i < len(df['object_id']):
+            object = {}
+            id = df['object_id'][i]
+            name = df['object_name'][i]
+            type = df['type'][i]
+            description = df['description'][i]
+            object['object_id'] = id
+            object['object_name'] = name
+            object['type'] = type
+            object['description'] = description
+            objects.append(object)
+            i = i + 1
 
     # if data exists, return it is JSON
     if objects is not None:
         return jsonify(objects)
     else:
-        return jsonify({'message' : 'Failed to fetch objects'}), 500
+        return jsonify({'message' : 'Failed to find objects.'}), 404
 
 @app.route('/object/<int:id>', methods=['GET'])
 def show_object(id):
@@ -337,6 +383,7 @@ def show_object(id):
     select * from objects
     where object_id={id}
     """
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -355,7 +402,41 @@ def show_object(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch object {id}'}), 500
+        return jsonify({'message' : f'Failed to find object {id}'}), 404
+
+@app.route('/objects/add', methods=['POST'])
+def add_object():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'No data provided.'}), 400
+    
+    object_id = data.get('object_id')
+    object_name = data.get('object_name')
+    type = data.get('type')
+    desc = data.get('description')
+
+    df = pd.DataFrame({
+        'object_id' : [object_id],
+        'object_name' : [object_name],
+        'type' : [type],
+        'description' : [desc]
+    })
+    
+    if not object_id or not object_name:
+        return jsonify({'message': 'Missing required fields.'}), 400
+    
+    # db connection
+    cnx = db_connection()
+
+    # Insert the new object into the database
+    try:
+        df.to_sql('objects', con=cnx, if_exists='append', index=False)
+        return jsonify({'message': 'Object added successfully.'}), 201
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to add object.'}), 500
 
 @app.route('/earth_locations', methods=['GET'])
 def show_earth_locations():
@@ -413,31 +494,32 @@ def show_earth_locations():
     # format data returned
     df = df.to_dict()
     locations = []
-    i = 0
-    while i < len(df['earth_location_id']):
-        location = {}
-        id = df['earth_location_id'][i]
-        quad = df['quadrant'][i]
-        lat = df['latitude'][i]
-        long = df['longitude'][i]
-        timezone = df['timezone'][i]
-        time = df['local_time'][i]
-        desc = df['description'][i]
-        location['earth_location_id'] = id
-        location['quadrant'] = quad
-        location['latitude'] = lat
-        location['longitude'] = long
-        location['timezone'] = timezone
-        location['local_time'] = time
-        location['description'] = desc
-        locations.append(location)
-        i = i + 1
+    if df is not None:
+        i = 0
+        while i < len(df['earth_location_id']):
+            location = {}
+            id = df['earth_location_id'][i]
+            quad = df['quadrant'][i]
+            lat = df['latitude'][i]
+            long = df['longitude'][i]
+            timezone = df['timezone'][i]
+            time = df['local_time'][i]
+            desc = df['description'][i]
+            location['earth_location_id'] = id
+            location['quadrant'] = quad
+            location['latitude'] = lat
+            location['longitude'] = long
+            location['timezone'] = timezone
+            location['local_time'] = time
+            location['description'] = desc
+            locations.append(location)
+            i = i + 1
 
     # if data exists, return it is JSON
     if locations is not None:
         return jsonify(locations)
     else:
-        return jsonify({'message' : 'Failed to fetch Earth locations'}), 500
+        return jsonify({'message' : 'Failed to find Earth locations.'}), 404
 
 @app.route('/earth_location/<int:id>', methods=['GET'])
 def show_earth_location(id):
@@ -449,6 +531,7 @@ def show_earth_location(id):
     select * from earth_locations
     where earth_location_id={id}
     """
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -470,7 +553,47 @@ def show_earth_location(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch Earth location {id}'}), 500
+        return jsonify({'message' : f'Failed to find Earth location {id}.'}), 404
+
+@app.route('/earth_locations/add', methods=['POST'])
+def add_earth_location():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'No data provided.'}), 400
+    
+    id = data.get('earth_location_id')
+    quad = data.get('quadrant')
+    long = data.get('longitude')
+    lat = data.get('latitude')
+    zone = data.get('timezone')
+    time = data.get('local_time')
+    name = data.get('location_name')
+
+    df = pd.DataFrame({
+        'earth_location_id' : [id],
+        'quadrant' : [quad],
+        'longitude' : [long],
+        'latitude' : [lat],
+        'timezone' : [zone],
+        'local_time' : [time],
+        'location_name' : [name]
+    })
+    
+    if not id or not long or not lat or not zone or not time:
+        return jsonify({'message': 'Missing required fields.'}), 400
+    
+    # db connection
+    cnx = db_connection()
+
+    # Insert the new earth location into the database
+    try:
+        df.to_sql('earth_locations', con=cnx, if_exists='append', index=False)
+        return jsonify({'message': 'Earth location added successfully.'}), 201
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to add Earth location.'}), 500
 
 @app.route('/space_locations', methods=['GET'])
 def show_space_locations():
@@ -526,25 +649,26 @@ def show_space_locations():
 
     # format data returned
     locations = []
-    i = 0
-    while i < len(df['space_location_id']):
-        location = {}
-        id = df['space_location_id'][i]
-        ra = df['ra'][i]
-        de = df['de'][i]
-        description = df['description'][i]
-        location['space_location_id'] = id
-        location['ra'] = ra
-        location['de'] = de
-        location['description'] = description
-        locations.append(location)
-        i = i + 1
+    if df is not None:
+        i = 0
+        while i < len(df['space_location_id']):
+            location = {}
+            id = df['space_location_id'][i]
+            ra = df['ra'][i]
+            de = df['de'][i]
+            description = df['description'][i]
+            location['space_location_id'] = id
+            location['ra'] = ra
+            location['de'] = de
+            location['description'] = description
+            locations.append(location)
+            i = i + 1
 
     # if data exists, return it is JSON
     if locations is not None:
         return jsonify(locations)
     else:
-        return jsonify({'message' : 'Failed to fetch space locations'}), 500
+        return jsonify({'message' : 'Failed to find space locations.'}), 404
 
 @app.route('/space_location/<int:id>', methods=['GET'])
 def show_space_location(id):
@@ -556,6 +680,7 @@ def show_space_location(id):
     select * from space_locations
     where space_location_id={id}
     """
+
     try:
         df = pd.read_sql(sql,cnx)
     except Exception as e:
@@ -571,6 +696,7 @@ def show_space_location(id):
         if is_timedelta64_dtype(df_notdict[col]):
             df[col] = df_notdict[col].astype(str)
 
+
     # if data exists, return it is JSON
     if df is not None:
         return jsonify({
@@ -580,7 +706,41 @@ def show_space_location(id):
             'description' : df['description'][0]
         })
     else:
-        return jsonify({'message' : f'Failed to fetch space location {id}'}), 500
+        return jsonify({'message' : f'Failed to find space location {id}.'}), 404
+
+@app.route('/space_locations/add', methods=['POST'])
+def add_space_location():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'message' : 'No data provided.'}), 400
+    
+    id = data.get('space_location_id')
+    ra = data.get('ra')
+    de = data.get('de')
+    desc = data.get('description')
+
+    df = pd.DataFrame({
+        'space_location_id' : [id],
+        'ra' : [ra],
+        'de'  : [de],
+        'description' : [desc]
+    })
+    
+    if not id or not ra or not de:
+        return jsonify({'message': 'Missing required fields.'}), 400
+    
+    # db connection
+    cnx = db_connection()
+
+    # Insert the new space location into the database
+    try:
+        df.to_sql('space_locations', con=cnx, if_exists='append', index=False)
+        return jsonify({'message': 'Space location added successfully.'}), 201
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to add space location.'}), 500
 
 if __name__ == "__main__":
     app.run()

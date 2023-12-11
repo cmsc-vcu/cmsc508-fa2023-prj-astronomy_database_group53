@@ -62,7 +62,7 @@ INSERT INTO objects (object_id, object_name, type, description) VALUES
 
 create table events (
     event_id int not null primary key,
-    event_name varchar(255),
+    event_name varchar(255) not null,
     date_occurred date not null,
     duration float,
     frequency float
