@@ -353,7 +353,7 @@ if __name__ == '__main__':
     remove_object(16)
     print()
 
-    #get_earth_locations()
+    get_earth_locations()
     print()
     add_earth_location(id=16, quad='NE', long='40.7128', lat='-74.0060', zone='UTC-4', time='12:00:00', name='New York')
     print()
@@ -374,7 +374,3 @@ if __name__ == '__main__':
     print()
     remove_space_location(16)
     print()
-
-
-
-    
