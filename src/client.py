@@ -4,6 +4,7 @@ import json
 
 app = Flask(__name__)
 
+# observers endpoints
 def get_observers():
     response = requests.get('http://localhost:5000/observers')
     if response.status_code == 200:
@@ -28,7 +29,7 @@ def add_observer(id, first_name, last_name):
     if response.status_code == 201:
         data = response.json()
         print("Observer Added:")
-        print(data, indent=4)
+        print(json.dumps(data, indent=4))
     elif response.status_code == 400:
         data = response.json()
         print("Error Encountered:")
@@ -36,6 +37,20 @@ def add_observer(id, first_name, last_name):
     else:
         print(f"Request failed with status code {response.status_code}")
 
+def remove_observer(id):
+    data = {"observer_id" : id}
+    response = requests.delete(f'http://localhost:5000/observers/remove/{id}', json=data)
+    if response.status_code == 200:
+        data = response.json()
+        print(json.dumps(data, indent=4))
+    elif response.status_code == 400:
+        data = response.json()
+        print("Error Encountered:")
+        print(data)
+    else:
+        print(f"Request failed with status code {response.status_code}")
+
+# events endpoints
 def get_events():
     response = requests.get('http://localhost:5000/events')
     if response.status_code == 200:
@@ -74,6 +89,8 @@ def add_event(id, name, date, dur, frq, desc):
     else:
         print(f"Request failed with status code {response.status_code}")
 
+
+# objects endpoints
 def get_objects():
     response = requests.get('http://localhost:5000/objects')
     if response.status_code == 200:
@@ -106,6 +123,8 @@ def add_object(id, name, type, desc):
     else:
         print(f"Request failed with status code {response.status_code}")
 
+
+# earth location endpoints
 def get_earth_locations():
     response = requests.get('http://localhost:5000/earth_locations')
     if response.status_code == 200:
@@ -146,6 +165,8 @@ def add_earth_location(id, quad, long, lat, zone, time, name):
     else:
         print(f"Request failed with status code {response.status_code}")
 
+
+# space location endpoints
 def get_space_locations():
     response = requests.get('http://localhost:5000/space_locations')
     if response.status_code == 200:
@@ -184,10 +205,15 @@ def add_space_location(id, ra, de, desc):
         print(f"Request failed with status code {response.status_code}")
 
 
+# printing output of functions
 if __name__ == '__main__':
-    get_observers()
+    #get_observers()
+    #print()
+    add_observer(19, 'Butterscotch', 'The Cat')
     print()
     get_observer(19)
+    print()
+    remove_observer(19)
 
 
 

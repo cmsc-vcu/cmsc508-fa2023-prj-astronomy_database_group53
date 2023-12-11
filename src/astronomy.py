@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from pandas.api.types import is_timedelta64_dtype
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 import pandas as pd
 import os
@@ -33,6 +33,8 @@ def db_connection():
         
 app = Flask(__name__)
 
+
+# observer endpoints
 @app.route('/')
 def index():
     return jsonify({
@@ -162,6 +164,38 @@ def add_observer():
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
         return jsonify({'message': 'Failed to add observer.'}), 500
 
+@app.route('/observers/remove/<int:id>', methods=['DELETE'])
+def remove_observer(id):
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        # check if observer exists
+        sql = f"select observer_id from observers where observer_id={id}"
+        observer = pd.read_sql(sql, cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to check observer existence.'}), 500
+    
+    if not observer.empty:
+        try:
+            # remove observer
+            sql = f"delete from observers where observer_id={id}"
+            cnx_conn.execute(text(sql))
+            cnx_conn.commit()
+            cnx_conn.close()
+            return jsonify({'message' : f"Successfully removed observer {id}"}), 200
+        except Exception as e:
+            message = str(e)
+            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
+            return jsonify({'message': 'Failed to remove observer.'}), 500
+    else:
+        return jsonify({'message': f'Observer {id} not found.'}), 404
+
+
+# event endpoints
 @app.route('/events', methods=['GET'])
 def show_events():
     # db connection
@@ -305,6 +339,38 @@ def add_event():
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
         return jsonify({'message': 'Failed to add event.'}), 500
 
+@app.route('/events/remove/<int:id>', methods=['DELETE'])
+def remove_event(id):
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        # Check if the event exists
+        sql = f"select event_id from events where event_id={id}"
+        event = pd.read_sql(sql, cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to check event existence.'}), 500
+    
+    if not event.empty:
+        try:
+            # Remove event
+            sql = f"delete from events where event_id={id}"
+            cnx_conn.execute(text(sql))
+            cnx_conn.commit()
+            cnx_conn.close()
+            return jsonify({'message': f'Successfully removed event {id}'}), 200
+        except Exception as e:
+            message = str(e)
+            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
+            return jsonify({'message': 'Failed to remove event.'}), 500
+    else:
+        return jsonify({'message': f'Event {id} not found.'}), 404
+
+
+# object endpoints
 @app.route('/objects', methods=['GET'])
 def show_objects():
     # db connection
@@ -438,6 +504,38 @@ def add_object():
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
         return jsonify({'message': 'Failed to add object.'}), 500
 
+@app.route('/objects/remove/<int:id>', methods=['DELETE'])
+def remove_object(id):
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        # Check if the object exists
+        sql = f"select object_id from objects where object_id={id}"
+        obj = pd.read_sql(sql, cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to check object existence.'}), 500
+    
+    if not obj.empty:
+        try:
+            # Remove object
+            sql = f"delete from objects where object_id={id}"
+            cnx_conn.execute(text(sql))
+            cnx_conn.commit()
+            cnx_conn.close()
+            return jsonify({'message': f'Successfully removed object {id}'}), 200
+        except Exception as e:
+            message = str(e)
+            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
+            return jsonify({'message': 'Failed to remove object.'}), 500
+    else:
+        return jsonify({'message': f'Object {id} not found.'}), 404
+
+
+# earth_location endpoints
 @app.route('/earth_locations', methods=['GET'])
 def show_earth_locations():
     # db connection
@@ -595,6 +693,38 @@ def add_earth_location():
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
         return jsonify({'message': 'Failed to add Earth location.'}), 500
 
+@app.route('/earth_locations/remove/<int:id>', methods=['DELETE'])
+def remove_earth_location(id):
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        # Check if the earth location exists
+        sql = f"select earth_location_id from earth_locations where earth_location_id={id}"
+        earth_loc = pd.read_sql(sql, cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to check earth location existence.'}), 500
+    
+    if not earth_loc.empty:
+        try:
+            # Remove earth location
+            sql = f"delete from earth_locations where earth_location_id={id}"
+            cnx_conn.execute(text(sql))
+            cnx_conn.commit()
+            cnx_conn.close()
+            return jsonify({'message': f'Successfully removed earth location {id}'}), 200
+        except Exception as e:
+            message = str(e)
+            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
+            return jsonify({'message': 'Failed to remove earth location.'}), 500
+    else:
+        return jsonify({'message': f'Earth location {id} not found.'}), 404
+
+
+# space location endpoints
 @app.route('/space_locations', methods=['GET'])
 def show_space_locations():
     # db connection
@@ -741,6 +871,37 @@ def add_space_location():
         message = str(e)
         print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
         return jsonify({'message': 'Failed to add space location.'}), 500
+
+@app.route('/space_locations/remove/<int:id>', methods=['DELETE'])
+def remove_space_location(id):
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        # Check if the space location exists
+        sql = f"select space_location_id from space_locations where space_location_id={id}"
+        space_loc = pd.read_sql(sql, cnx)
+    except Exception as e:
+        message = str(e)
+        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+        return jsonify({'message': 'Failed to check space location existence.'}), 500
+    
+    if not space_loc.empty:
+        try:
+            # Remove space location
+            sql = f"delete from space_locations where space_location_id={id}"
+            cnx_conn.execute(text(sql))
+            cnx_conn.commit()
+            cnx_conn.close()
+            return jsonify({'message': f'Successfully removed space location {id}'}), 200
+        except Exception as e:
+            message = str(e)
+            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
+            return jsonify({'message': 'Failed to remove space location.'}), 500
+    else:
+        return jsonify({'message': f'Space location {id} not found.'}), 404
+
 
 if __name__ == "__main__":
     app.run()
