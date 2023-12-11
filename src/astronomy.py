@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
 from pandas.api.types import is_timedelta64_dtype
 from sqlalchemy import create_engine, text
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+from datetime import datetime
 import pandas as pd
 import os
 
@@ -31,7 +32,17 @@ def db_connection():
         return 1
     return cnx
         
+def authorization():
+    authorized = False
+    if "Authorization" in request.headers:
+        token = request.headers['Authorization']
+        if token == 'Bearer super-secret':
+            authorized = True
+    return authorized
+
+
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'super-secret'
 
 
 # observer endpoints
@@ -43,29 +54,29 @@ def index():
 
 @app.route('/observers', methods=['GET'])
 def show_observers():
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+
     # db connection
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # get query parameters from URL
     first_name = request.args.get('first_name')
     last_name = request.args.get('last_name')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
-    # query database
     sql = "select * from observers"
-
-    # add filters based on the provided query parameters
     conditions = []
-    if first_name:
-        conditions.append(f" first_name = '{first_name}'")
-    if last_name:
-        conditions.append(f" last_name = '{last_name}'")
 
-    # constructing the where clause
+    if first_name:
+        conditions.append(f"first_name = '{first_name}'")
+    if last_name:
+        conditions.append(f"last_name = '{last_name}'")
+
     if conditions:
-        sql += " where" + " and".join(conditions)
+        sql += " where " + " and ".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -79,154 +90,223 @@ def show_observers():
             sql += f" offset {per_page * (page - 1)}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    # format data returned
-    df = df.to_dict()
-    observers = []
-
-    for i in range(len(df['observer_id'])):
-        observer = {}
-        observer['observer_id'] = df['observer_id'][i]
-        observer['first_name'] = df['first_name'][i]
-        observer['last_name'] = df['last_name'][i]
-        observers.append(observer)
-
-
-    # if data exists, return it is JSON
-    if observers is not None:
+    if data is not None:
+        observers = []
+        for row in data.fetchall():
+            observer = {
+                'observer_id': row[0],
+                'first_name': row[1],
+                'last_name': row[2]
+            }
+            observers.append(observer)
         return jsonify(observers)
     else:
-        return jsonify({'message' : 'Failed to find observers.'}), 404
+        return jsonify({'message': 'Failed to find observers.'}), 404
 
 @app.route(f'/observer/<int:id>', methods=['GET'])
 def show_observer(id):
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    #db connection
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    #query database
-    sql= f"""
-    select * from observers
-    where observer_id={id}
-    """
+    sql = f"select * from observers where observer_id = {id}"
+
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df = df.to_dict()
-
-    # if data exists, return it is JSON
-    if df is not None:
-        return jsonify({
-            'observer_id' : df['observer_id'][0],
-            'first_name' : df['first_name'][0],
-            'last_name' : df['last_name'][0]
-        })
+    data = data.fetchone()
+    if data is not None:
+        observer_details = {
+            'observer_id': data[0],
+            'first_name': data[1],
+            'last_name': data[2]
+        }
+        return jsonify({'observer_details': observer_details})
     else:
-        return jsonify({'message' : f'Failed to find observer {id}'}), 404
-    
+        return jsonify({'message': f'Failed to find observer {id}'}), 404
+
 @app.route('/observers/add', methods=['POST'])
 def add_observer():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'message' : 'No data provided.'}), 400
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
     
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
     observer_id = data.get('observer_id')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    df = pd.DataFrame({
-        'observer_id' : [observer_id],
-        'first_name' : [first_name],
-        'last_name' : [last_name]
-    })
-    
-    if not observer_id or not first_name or not last_name:
-        return jsonify({'message': 'Missing required fields.'}), 400
-    
-    # db connection
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # Insert the new observer into the database
     try:
-        df.to_sql('observers', con=cnx, if_exists='append', index=False)
-        return jsonify({'message': 'Observer added successfully.'}), 201
+        sql_check = f"select observer_id from observers where observer_id = {observer_id}"
+        observer = pd.read_sql(sql_check, cnx)
+
+        if observer.empty:
+            if not observer_id or not first_name or not last_name:
+                return jsonify({'message': 'Missing required fields.'}), 400
+
+            df = pd.DataFrame({
+                'observer_id': [observer_id],
+                'first_name': [first_name],
+                'last_name': [last_name]
+            })
+
+            df.to_sql('observers', con=cnx, if_exists='append', index=False)
+            cnx_conn.commit()
+            cnx_conn.close()
+
+            return jsonify({'message': 'Observer added successfully.', 'observer_details': {
+                'observer_id': observer_id,
+                'first_name': first_name,
+                'last_name': last_name
+            }}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({"message": f"Observer of id {observer_id} already exists."}), 400
+
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add observer.'}), 500
+        return jsonify({'message': 'Failed to add observer.', 'error': message}), 500
 
 @app.route('/observers/remove/<int:id>', methods=['DELETE'])
 def remove_observer(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     # db connection
     cnx = db_connection()
     cnx_conn = cnx.connect()
 
     try:
-        # check if observer exists
-        sql = f"select observer_id from observers where observer_id={id}"
-        observer = pd.read_sql(sql, cnx)
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to check observer existence.'}), 500
-    
-    if not observer.empty:
-        try:
-            # remove observer
-            sql = f"delete from observers where observer_id={id}"
-            cnx_conn.execute(text(sql))
+        sql_check = f"select observer_id from observers where observer_id = {id}"
+        observer = pd.read_sql(sql_check, cnx)
+
+        if not observer.empty:
+            sql_delete = f"delete from observers where observer_id = {id}"
+            cnx_conn.execute(text(sql_delete))
             cnx_conn.commit()
             cnx_conn.close()
-            return jsonify({'message' : f"Successfully removed observer {id}"}), 200
-        except Exception as e:
-            message = str(e)
-            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
-            return jsonify({'message': 'Failed to remove observer.'}), 500
-    else:
-        return jsonify({'message': f'Observer {id} not found.'}), 404
+            
+            return jsonify({'message': f"Successfully removed observer {id}."}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Observer {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to remove observer.', 'error': message}), 500
+
+@app.route('/observers/edit/<int:id>', methods=['POST'])
+def update_observer(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    # db connection
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    attributes = data.get('attribute')
+    values = data.get('value')
+    if not attributes or not values or len(attributes) != len(values):
+        return jsonify({'message': 'Invalid attributes or values.'}), 400
+
+    try:
+        sql_check = f"select observer_id from observers where observer_id = {id}"
+        observer = pd.read_sql(sql_check, cnx)
+
+        if not observer.empty:
+            sql_update = "update observers set "
+            set_values = []
+            for att, val in zip(attributes, values):
+                if att.lower() == 'observer_id':
+                    return jsonify({"message": 'Primary keys cannot be changed.'}), 400
+                else:
+                    set_values.append(f"{att} = '{val}'")
+
+            sql_update += ", ".join(set_values)
+            sql_update += f" where observer_id = {id}"
+
+            cnx_conn.execute(text(sql_update))
+            cnx_conn.commit()
+
+            info = pd.read_sql(f"select * from observers where observer_id = {id}", cnx)
+            cnx_conn.close()
+            updated = info.to_dict(orient='records')[0]
+
+            return jsonify({'message': 'Observer updated successfully.', 'observer_details': updated}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Observer {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to update observer.', 'error': message}), 500
 
 
 # event endpoints
 @app.route('/events', methods=['GET'])
 def show_events():
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # get query parameters from URL
-    name = request.args.get('name')
-    date = request.args.get('date')
-    duration = request.args.get('duration')
+    event_name = request.args.get('event_name')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    min_duration = request.args.get('min_duration')
+    max_duration = request.args.get('max_duration')
     frequency = request.args.get('frequency')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
-    # query database
     sql = "select * from events"
-
-    # add filters based on the provided query parameters
     conditions = []
-    if name:
-        conditions.append(f" event_name = '{name}'")
-    if date:
-        conditions.append(f" date_occurred = '{date}'")
-    if duration:
-        conditions.append(f" duration = '{duration}'")
-    if frequency:
-        conditions.append(f" frequency = '{frequency}'")
 
-    # constructing the where clause
+    if event_name:
+        conditions.append(f"event_name = '{event_name}'")
+
+    if start_date and end_date:
+        try:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d")
+            end_date = datetime.strptime(end_date, "%Y-%m-%d")
+            conditions.append(f"date_occurred between '{start_date}' and '{end_date}'")
+        except ValueError:
+            return jsonify({'message': 'Invalid date format. Use YYYY-MM-DD.'}), 400
+
+    if min_duration and max_duration:
+        conditions.append(f"duration between {min_duration} and {max_duration}")
+
+    if frequency:
+        conditions.append(f"frequency = '{frequency}'")
+
     if conditions:
-        sql += " where" + " and".join(conditions)
+        sql += " where " + " and ".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -240,162 +320,210 @@ def show_events():
             sql += f" offset {per_page * (page - 1)}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    # format data returned
-    df = df.to_dict()
-    events = []
-    i = 0
-    while i < len(df['event_id']):
-        event = {}
-        id = df['event_id'][i]
-        name = df['event_name'][i]
-        date = df['date_occurred'][i]
-        duration = df['duration'][i]
-        frequency = df['frequency'][i]
-        event['event_id'] = id
-        event['event_name'] = name
-        event['date_occurred'] = date
-        event['duration'] = duration
-        event['frequency'] = frequency
-        events.append(event)
-        i = i + 1
-
-    # if data exists, return it is JSON
-    if events is not None:
+    if data is not None:
+        events = []
+        for row in data.fetchall():
+            event = {
+                'event_id': row[0],
+                'event_name': row[1],
+                'date_occurred': row[2],
+                'duration': row[3],
+                'frequency': row[4]
+            }
+            events.append(event)
         return jsonify(events)
     else:
-        return jsonify({'message' : 'Failed to find events'}), 404
+        return jsonify({'message': 'Failed to find events.'}), 404
 
-@app.route('/event/<int:id>', methods=['GET'])
+@app.route(f'/event/<int:id>', methods=['GET'])
 def show_event(id):
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    #query database
-    sql= f"""
-    select * from events
-    where event_id={id}
-    """
+    sql = f"select * from events where event_id = {id}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df = df.to_dict()
-
-    # if data exists, return it is JSON
-    if df is not None:
-        return jsonify({
-            'event_id' : df['event_id'][0], 
-            'event_name' : df['event_name'][0],
-            'date_occurred' : df['date_occurred'][0],
-            'duration' : df['duration'][0],
-            'frequency' : df['frequency'][0]
-        })
+    data = data.fetchone()
+    if data is not None:
+        event_details = {
+            'event_id': data[0],
+            'event_name': data[1],
+            'date_occurred': data[2],
+            'duration': data[3],
+            'frequency': data[4]
+        }
+        return jsonify({'event_details': event_details})
     else:
-        return jsonify({'message' : f'Failed to find event {id}'}), 404
+        return jsonify({'message': f'Failed to find event {id}'}), 404
 
 @app.route('/events/add', methods=['POST'])
 def add_event():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'message' : 'No data provided.'}), 400
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
     
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
     event_id = data.get('event_id')
     event_name = data.get('event_name')
     date_occurred = data.get('date_occurred')
     duration = data.get('duration')
-    frequency = data.get('duration')
+    frequency = data.get('frequency')
 
-    df = pd.DataFrame[{
-        'event_id' : [event_id],
-        'event_name' : [event_name],
-        'date_occurred' : [date_occurred],
-        'duration' : [duration],
-        'frequency' : [frequency]
-    }]
-
-    if not event_id or not event_name or not date_occurred:
-        return jsonify({'message': 'Missing required fields.'}), 400
-    
-    # db connection
-    cnx = db_connection()
-
-    # Insert the new event into the database
-    try:
-        df.to_sql('events', con=cnx, if_exists='append', index=False)
-        return jsonify({'message': 'Event added successfully.'}), 201
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add event.'}), 500
-
-@app.route('/events/remove/<int:id>', methods=['DELETE'])
-def remove_event(id):
-    # db connection
     cnx = db_connection()
     cnx_conn = cnx.connect()
 
     try:
-        # Check if the event exists
-        sql = f"select event_id from events where event_id={id}"
-        event = pd.read_sql(sql, cnx)
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to check event existence.'}), 500
-    
-    if not event.empty:
-        try:
-            # Remove event
-            sql = f"delete from events where event_id={id}"
-            cnx_conn.execute(text(sql))
+        sql_check = f"select event_id from events where event_id = {event_id}"
+        event = pd.read_sql(sql_check, cnx)
+
+        if event.empty:
+            if not event_id or not event_name or not date_occurred:
+                return jsonify({'message': 'Missing required fields.'}), 400
+
+            sql_add = f"insert into events (event_id, event_name, date_occurred, duration, frequency) values " \
+                      f"({event_id}, '{event_name}', '{date_occurred}', {duration}, '{frequency}')"
+
+            cnx_conn.execute(text(sql_add))
             cnx_conn.commit()
             cnx_conn.close()
-            return jsonify({'message': f'Successfully removed event {id}'}), 200
-        except Exception as e:
-            message = str(e)
-            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
-            return jsonify({'message': 'Failed to remove event.'}), 500
-    else:
-        return jsonify({'message': f'Event {id} not found.'}), 404
+
+            return jsonify({'message': 'Event added successfully.', 'event_details': {
+                'event_id': event_id,
+                'event_name': event_name,
+                'date_occurred': date_occurred,
+                'duration': duration,
+                'frequency': frequency
+            }}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({"message": f"Event of id {event_id} already exists."}), 400
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to add event.', 'error': message}), 500
+
+@app.route('/events/remove/<int:id>', methods=['DELETE'])
+def remove_event(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        sql_check = f"select event_id from events where event_id = {id}"
+        event = pd.read_sql(sql_check, cnx)
+
+        if not event.empty:
+            sql_delete = f"delete from events where event_id = {id}"
+            cnx_conn.execute(text(sql_delete))
+            cnx_conn.commit()
+            cnx_conn.close()
+
+            return jsonify({'message': f"Successfully removed event {id}."}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Event {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to remove event.', 'error': message}), 500
+
+@app.route('/events/edit/<int:id>', methods=['POST'])
+def update_event(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    attributes = data.get('attribute')
+    values = data.get('value')
+    if not attributes or not values or len(attributes) != len(values):
+        return jsonify({'message': 'Invalid attributes or values.'}), 400
+
+    try:
+        sql_check = f"select event_id from events where event_id = {id}"
+        event = pd.read_sql(sql_check, cnx)
+
+        if not event.empty:
+            sql_update = "update events set "
+            set_values = []
+            for att, val in zip(attributes, values):
+                if att.lower() == 'event_id':
+                    return jsonify({"message": 'Primary keys cannot be changed.'}), 400
+                else:
+                    set_values.append(f"{att} = '{val}'")
+
+            sql_update += ", ".join(set_values)
+            sql_update += f" where event_id = {id}"
+
+            cnx_conn.execute(text(sql_update))
+            cnx_conn.commit()
+
+            info = pd.read_sql(f"select * from events where event_id = {id}", cnx)
+            cnx_conn.close()
+            updated = info.to_dict(orient='records')[0]
+
+            return jsonify({'message': 'Event updated successfully.', 'event_details': updated}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Event {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to update event.', 'error': message}), 500
 
 
 # object endpoints
 @app.route('/objects', methods=['GET'])
 def show_objects():
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # get query parameters from URL
-    name = request.args.get('object_name')
-    type = request.args.get('type')
+    object_name = request.args.get('object_name')
+    object_type = request.args.get('type')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
-    # query database
     sql = "select * from objects"
-    
-    # add filters based on the provided query parameters
     conditions = []
-    if name:
-        conditions.append(f" event_name = '{name}'")
-    if type:
-        conditions.append(f" type = '{type}'")
 
-    # constructing the where clause
+    if object_name:
+        conditions.append(f"object_name = '{object_name}'")
+
+    if object_type:
+        conditions.append(f"type = '{object_type}'")
+
     if conditions:
-        sql += " where" + " and".join(conditions)
+        sql += " where " + " and ".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -407,169 +535,220 @@ def show_objects():
         page = request.args.get('page', default=1, type=int)
         if page > 1:
             sql += f" offset {per_page * (page - 1)}"
-    
+
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    # format data returned
-    df = df.to_dict()
-    objects = []
-    if df is not None:
-        i = 0
-        while i < len(df['object_id']):
-            object = {}
-            id = df['object_id'][i]
-            name = df['object_name'][i]
-            type = df['type'][i]
-            description = df['description'][i]
-            object['object_id'] = id
-            object['object_name'] = name
-            object['type'] = type
-            object['description'] = description
-            objects.append(object)
-            i = i + 1
-
-    # if data exists, return it is JSON
-    if objects is not None:
+    if data is not None:
+        objects = []
+        for row in data.fetchall():
+            obj = {
+                'object_id': row[0],
+                'object_name': row[1],
+                'type': row[2],
+                'description': row[3]
+            }
+            objects.append(obj)
         return jsonify(objects)
     else:
-        return jsonify({'message' : 'Failed to find objects.'}), 404
+        return jsonify({'message': 'Failed to find objects.'}), 404
 
-@app.route('/object/<int:id>', methods=['GET'])
+@app.route(f'/object/<int:id>', methods=['GET'])
 def show_object(id):
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    #query database
-    sql= f"""
-    select * from objects
-    where object_id={id}
-    """
+    sql = f"select * from objects where object_id = {id}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df = df.to_dict()
-
-    # if data exists, return it is JSON
-    if df is not None:
-        return jsonify({
-            'object_id' : df['object_id'][0],
-            'object_name' : df['object_name'][0],
-            'type' : df['type'][0],
-            'description' : df['description'][0]
-        })
+    data = data.fetchone()
+    if data is not None:
+        object_details = {
+            'object_id': data[0],
+            'object_name': data[1],
+            'type': data[2],
+            'description': data[3]
+        }
+        return jsonify({'object_details': object_details})
     else:
-        return jsonify({'message' : f'Failed to find object {id}'}), 404
+        return jsonify({'message': f'Failed to find object {id}'}), 404
 
 @app.route('/objects/add', methods=['POST'])
 def add_object():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'message' : 'No data provided.'}), 400
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
     
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
     object_id = data.get('object_id')
     object_name = data.get('object_name')
-    type = data.get('type')
-    desc = data.get('description')
+    object_type = data.get('type')
+    description = data.get('description')
 
-    df = pd.DataFrame({
-        'object_id' : [object_id],
-        'object_name' : [object_name],
-        'type' : [type],
-        'description' : [desc]
-    })
-    
-    if not object_id or not object_name:
-        return jsonify({'message': 'Missing required fields.'}), 400
-    
-    # db connection
-    cnx = db_connection()
-
-    # Insert the new object into the database
-    try:
-        df.to_sql('objects', con=cnx, if_exists='append', index=False)
-        return jsonify({'message': 'Object added successfully.'}), 201
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add object.'}), 500
-
-@app.route('/objects/remove/<int:id>', methods=['DELETE'])
-def remove_object(id):
-    # db connection
     cnx = db_connection()
     cnx_conn = cnx.connect()
 
     try:
-        # Check if the object exists
-        sql = f"select object_id from objects where object_id={id}"
-        obj = pd.read_sql(sql, cnx)
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to check object existence.'}), 500
-    
-    if not obj.empty:
-        try:
-            # Remove object
-            sql = f"delete from objects where object_id={id}"
-            cnx_conn.execute(text(sql))
+        sql_check = f"select object_id from objects where object_id = {object_id}"
+        obj = pd.read_sql(sql_check, cnx)
+
+        if obj.empty:
+            if not object_id or not object_name or not object_type:
+                return jsonify({'message': 'Missing required fields.'}), 400
+
+            df = pd.DataFrame({
+                'object_id': [object_id],
+                'object_name': [object_name],
+                'type': [object_type],
+                'description': [description]
+            })
+
+            df.to_sql('objects', con=cnx, if_exists='append', index=False)
             cnx_conn.commit()
             cnx_conn.close()
-            return jsonify({'message': f'Successfully removed object {id}'}), 200
-        except Exception as e:
-            message = str(e)
-            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
-            return jsonify({'message': 'Failed to remove object.'}), 500
-    else:
-        return jsonify({'message': f'Object {id} not found.'}), 404
+
+            return jsonify({'message': 'Object added successfully.', 'object_details': {
+                'object_id': object_id,
+                'object_name': object_name,
+                'type': object_type,
+                'description': description
+            }}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({"message": f"Object of id {object_id} already exists."}), 400
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to add object.', 'error': message}), 500
+
+@app.route('/objects/remove/<int:id>', methods=['DELETE'])
+def remove_object(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        sql_check = f"select object_id from objects where object_id = {id}"
+        obj = pd.read_sql(sql_check, cnx)
+
+        if not obj.empty:
+            sql_delete = f"delete from objects where object_id = {id}"
+            cnx_conn.execute(text(sql_delete))
+            cnx_conn.commit()
+            cnx_conn.close()
+
+            return jsonify({'message': f"Successfully removed object {id}."}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Object {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to remove object.', 'error': message}), 500
+
+@app.route('/objects/edit/<int:id>', methods=['POST'])
+def update_object(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    attributes = data.get('attribute')
+    values = data.get('value')
+    if not attributes or not values or len(attributes) != len(values):
+        return jsonify({'message': 'Invalid attributes or values.'}), 400
+
+    try:
+        sql_check = f"select object_id from objects where object_id = {id}"
+        obj = pd.read_sql(sql_check, cnx)
+
+        if not obj.empty:
+            sql_update = "update objects set "
+            set_values = []
+            for att, val in zip(attributes, values):
+                if att.lower() == 'object_id':
+                    return jsonify({"message": 'Primary keys cannot be changed.'}), 400
+                else:
+                    set_values.append(f"{att} = '{val}'")
+
+            sql_update += ", ".join(set_values)
+            sql_update += f" where object_id = {id}"
+
+            cnx_conn.execute(text(sql_update))
+            cnx_conn.commit()
+
+            info = pd.read_sql(f"select * from objects where object_id = {id}", cnx)
+            cnx_conn.close()
+            updated = info.to_dict(orient='records')[0]
+
+            return jsonify({'message': 'Object updated successfully.', 'object_details': updated}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Object {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to update object.', 'error': message}), 500
 
 
-# earth_location endpoints
+# earth_locations endpoints
 @app.route('/earth_locations', methods=['GET'])
 def show_earth_locations():
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # get query parameters from URL
-    quad = request.args.get('quadrant')
-    lat = request.args.get('latitude')
-    long = request.args.get('longitude')
+    quadrant = request.args.get('quadrant')
+    longitude = request.args.get('longitude')
+    latitude = request.args.get('latitude')
     timezone = request.args.get('timezone')
-    time = request.args.get('local_time')
+    location_name = request.args.get('location_name')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
-    # query database
     sql = "select * from earth_locations"
-
-    # add filters based on the provided query parameters
     conditions = []
-    if quad:
-        conditions.append(f" quadrant = '{quad}'")
-    if lat:
-        conditions.append(f" latitude = '{lat}'")
-    if long:
-        conditions.append(f" longitude = '{long}'")
-    if timezone:
-        conditions.append(f" timezone = '{timezone}'")
-    if time:
-        conditions.append(f" local_time = '{time}'")
 
-    # constructing the where clause
+    if quadrant:
+        conditions.append(f"quadrant = '{quadrant}'")
+    if longitude:
+        conditions.append(f"longitude = {longitude}")
+    if latitude:
+        conditions.append(f"latitude = {latitude}")
+    if timezone:
+        conditions.append(f"timezone = '{timezone}'")
+    if location_name:
+        conditions.append(f"location_name = '{location_name}'")
+
     if conditions:
-        sql += " where" + " and".join(conditions)
+        sql += " where " + " and ".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -583,173 +762,232 @@ def show_earth_locations():
             sql += f" offset {per_page * (page - 1)}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    # format data returned
-    df = df.to_dict()
-    locations = []
-    if df is not None:
-        i = 0
-        while i < len(df['earth_location_id']):
-            location = {}
-            id = df['earth_location_id'][i]
-            quad = df['quadrant'][i]
-            lat = df['latitude'][i]
-            long = df['longitude'][i]
-            timezone = df['timezone'][i]
-            time = df['local_time'][i]
-            desc = df['description'][i]
-            location['earth_location_id'] = id
-            location['quadrant'] = quad
-            location['latitude'] = lat
-            location['longitude'] = long
-            location['timezone'] = timezone
-            location['local_time'] = time
-            location['description'] = desc
-            locations.append(location)
-            i = i + 1
-
-    # if data exists, return it is JSON
-    if locations is not None:
-        return jsonify(locations)
+    if data is not None:
+        earth_locations = []
+        for row in data.fetchall():
+            earth_location = {
+                'earth_location_id': row[0],
+                'quadrant': row[1],
+                'longitude': row[2],
+                'latitude': row[3],
+                'timezone': row[4],
+                'local_time': str(row[5]),
+                'location_name': row[6]
+            }
+            earth_locations.append(earth_location)
+        return jsonify(earth_locations)
     else:
-        return jsonify({'message' : 'Failed to find Earth locations.'}), 404
+        return jsonify({'message': 'Failed to find earth locations.'}), 404
 
-@app.route('/earth_location/<int:id>', methods=['GET'])
+@app.route(f'/earth_location/<int:id>', methods=['GET'])
 def show_earth_location(id):
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    #query database
-    sql= f"""
-    select * from earth_locations
-    where earth_location_id={id}
-    """
+    sql = f"select * from earth_locations where earth_location_id = {id}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df = df.to_dict()
-
-    # if data exists, return it is JSON
-    if df is not None:
-        return jsonify({
-            'earth_location_id' : df['earth_location_id'][0],
-            'quadrant' : df['quadrant'][0],
-            'latitude' : df['latitude'][0],
-            'longitude' : df['longitude'][0],
-            'timezone' : df['timezone'][0],
-            'local_time' : df['local_time'][0],
-            'description' : df['description'][0]
-        })
+    data = data.fetchone()
+    if data is not None:
+        earth_location_details = {
+            'earth_location_id': data[0],
+            'quadrant': data[1],
+            'longitude': data[2],
+            'latitude': data[3],
+            'timezone': data[4],
+            'local_time': str(data[5]),
+            'location_name': data[6]
+        }
+        return jsonify({'earth_location_details': earth_location_details})
     else:
-        return jsonify({'message' : f'Failed to find Earth location {id}.'}), 404
+        return jsonify({'message': f'Failed to find earth location {id}'}), 404
 
 @app.route('/earth_locations/add', methods=['POST'])
 def add_earth_location():
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     data = request.get_json()
-
     if not data:
-        return jsonify({'message' : 'No data provided.'}), 400
-    
-    id = data.get('earth_location_id')
-    quad = data.get('quadrant')
-    long = data.get('longitude')
-    lat = data.get('latitude')
-    zone = data.get('timezone')
-    time = data.get('local_time')
-    name = data.get('location_name')
+        return jsonify({'message': 'No data provided.'}), 400
 
-    df = pd.DataFrame({
-        'earth_location_id' : [id],
-        'quadrant' : [quad],
-        'longitude' : [long],
-        'latitude' : [lat],
-        'timezone' : [zone],
-        'local_time' : [time],
-        'location_name' : [name]
-    })
-    
-    if not id or not long or not lat or not zone or not time:
+    earth_location_id = data.get('earth_location_id')
+    longitude = data.get('longitude')
+    latitude = data.get('latitude')
+    timezone = data.get('timezone')
+    quadrant = data.get('quadrant')
+    location_name = data.get('location_name')
+    local_time = data.get('local_time')
+    local_time = str(local_time)
+
+    # Check for required fields
+    if not all([earth_location_id, longitude, latitude, timezone, local_time]):
         return jsonify({'message': 'Missing required fields.'}), 400
-    
-    # db connection
-    cnx = db_connection()
 
-    # Insert the new earth location into the database
-    try:
-        df.to_sql('earth_locations', con=cnx, if_exists='append', index=False)
-        return jsonify({'message': 'Earth location added successfully.'}), 201
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add Earth location.'}), 500
-
-@app.route('/earth_locations/remove/<int:id>', methods=['DELETE'])
-def remove_earth_location(id):
-    # db connection
     cnx = db_connection()
     cnx_conn = cnx.connect()
 
     try:
-        # Check if the earth location exists
-        sql = f"select earth_location_id from earth_locations where earth_location_id={id}"
-        earth_loc = pd.read_sql(sql, cnx)
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to check earth location existence.'}), 500
-    
-    if not earth_loc.empty:
-        try:
-            # Remove earth location
-            sql = f"delete from earth_locations where earth_location_id={id}"
-            cnx_conn.execute(text(sql))
+        sql_check = f"select earth_location_id from earth_locations where earth_location_id = {earth_location_id}"
+        earth_loc = pd.read_sql(sql_check, cnx)
+
+        if earth_loc.empty:
+            df = pd.DataFrame({
+                'earth_location_id': [earth_location_id],
+                'quadrant' : [quadrant],
+                'longitude': [longitude],
+                'latitude': [latitude],
+                'timezone': [timezone],
+                'local_time': [local_time],
+                'location_name' : [location_name]
+            })
+
+            df.to_sql('earth_locations', con=cnx, if_exists='append', index=False)
             cnx_conn.commit()
             cnx_conn.close()
-            return jsonify({'message': f'Successfully removed earth location {id}'}), 200
-        except Exception as e:
-            message = str(e)
-            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
-            return jsonify({'message': 'Failed to remove earth location.'}), 500
-    else:
-        return jsonify({'message': f'Earth location {id} not found.'}), 404
+
+            return jsonify({'message': 'Earth location added successfully.', 'earth_location_details': {
+                'earth_location_id': earth_location_id,
+                'quadrant' : quadrant,
+                'longitude': longitude,
+                'latitude': latitude,
+                'timezone': timezone,
+                'local_time': local_time,
+                'location_name' : location_name
+            }}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({"message": f"Earth location of id {earth_location_id} already exists."}), 400
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to add earth location.', 'error': message}), 500
+
+@app.route('/earth_locations/remove/<int:id>', methods=['DELETE'])
+def remove_earth_location(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        sql_check = f"select earth_location_id from earth_locations where earth_location_id = {id}"
+        earth_loc = pd.read_sql(sql_check, cnx)
+
+        if not earth_loc.empty:
+            sql_delete = f"delete from earth_locations where earth_location_id = {id}"
+            cnx_conn.execute(text(sql_delete))
+            cnx_conn.commit()
+            cnx_conn.close()
+
+            return jsonify({'message': f"Successfully removed earth location {id}."}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Earth location {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to remove earth location.', 'error': message}), 500
+
+@app.route('/earth_locations/edit/<int:id>', methods=['POST'])
+def update_earth_location(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    attributes = data.get('attribute')
+    values = data.get('value')
+
+    # Check for required fields
+    if not attributes or not values or len(attributes) != len(values):
+        return jsonify({'message': 'Invalid attributes or values.'}), 400
+
+    try:
+        sql_check = f"select earth_location_id from earth_locations where earth_location_id = {id}"
+        obj = pd.read_sql(sql_check, cnx)
+
+        if not obj.empty:
+            sql_update = "update earth_locations set "
+            set_values = []
+            for att, val in zip(attributes, values):
+                if att.lower() == 'earth_location_id':
+                    return jsonify({"message": 'Primary keys cannot be changed.'}), 400
+                else:
+                    set_values.append(f"{att} = '{val}'")
+
+            sql_update += ", ".join(set_values)
+            sql_update += f" where earth_location_id = {id}"
+
+            cnx_conn.execute(text(sql_update))
+            cnx_conn.commit()
+
+            info = pd.read_sql(f"select * from earth_locations where earth_location_id = {id}", cnx)
+            cnx_conn.close()
+            updated = info.to_dict(orient='records')[0]
+            updated['local_time'] = str(updated['local_time'])
+
+            return jsonify({'message': 'Earth location updated successfully.', 'location_details': updated}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Earth location {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to update earth location.', 'error': message}), 500
 
 
 # space location endpoints
 @app.route('/space_locations', methods=['GET'])
 def show_space_locations():
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    # get query parameters from URL
     ra = request.args.get('ra')
     de = request.args.get('de')
+    description = request.args.get('description')
     sort_by = request.args.get('sort_by')
     order_by = request.args.get('order_by')
     per_page = request.args.get('per_page')
 
-    # query database
     sql = "select * from space_locations"
-
-    # add filters based on the provided query parameters
     conditions = []
-    if ra:
-        conditions.append(f" ra = '{ra}'")
-    if de:
-        conditions.append(f" de = '{de}'")
 
-    # constructing the where clause
+    if ra:
+        conditions.append(f"ra = '{ra}'")
+    if de:
+        conditions.append(f"de = '{de}'")
+    if description:
+        conditions.append(f"description = '{description}'")
+
     if conditions:
-        sql += " where" + " and".join(conditions)
+        sql += " where " + " and ".join(conditions)
 
     if sort_by:
         sql += f" order by {sort_by}"
@@ -763,144 +1001,188 @@ def show_space_locations():
             sql += f" offset {per_page * (page - 1)}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df_notdict = df
-    df = df.to_dict()
-
-    # Convert Timedelta columns to compatible format
-    for col in df_notdict.columns:
-        if is_timedelta64_dtype(df_notdict[col]):
-            df[col] = df_notdict[col].astype(str)
-
-    # format data returned
-    locations = []
-    if df is not None:
-        i = 0
-        while i < len(df['space_location_id']):
-            location = {}
-            id = df['space_location_id'][i]
-            ra = df['ra'][i]
-            de = df['de'][i]
-            description = df['description'][i]
-            location['space_location_id'] = id
-            location['ra'] = ra
-            location['de'] = de
-            location['description'] = description
-            locations.append(location)
-            i = i + 1
-
-    # if data exists, return it is JSON
-    if locations is not None:
-        return jsonify(locations)
+    if data is not None:
+        space_locations = []
+        for row in data.fetchall():
+            space_location = {
+                'space_location_id': row[0],
+                'ra': str(row[1]),
+                'de': row[2],
+                'description': row[3]
+            }
+            space_locations.append(space_location)
+        return jsonify(space_locations)
     else:
-        return jsonify({'message' : 'Failed to find space locations.'}), 404
+        return jsonify({'message': 'Failed to find space locations.'}), 404
 
-@app.route('/space_location/<int:id>', methods=['GET'])
+@app.route(f'/space_location/<int:id>', methods=['GET'])
 def show_space_location(id):
-    # db connection
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
     cnx = db_connection()
+    cnx_conn = cnx.connect()
 
-    #query database
-    sql= f"""
-    select * from space_locations
-    where space_location_id={id}
-    """
+    sql = f"select * from space_locations where space_location_id = {id}"
 
     try:
-        df = pd.read_sql(sql,cnx)
+        data = cnx_conn.execute(text(sql))
+        cnx_conn.commit()
+        cnx_conn.close()
     except Exception as e:
         message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        df = pd.DataFrame()
+        return jsonify({'message': 'Failed to execute query', 'error': message}), 500
 
-    df_notdict = df
-    df = df.to_dict()
-
-    # Convert Timedelta columns to compatible format
-    for col in df_notdict.columns:
-        if is_timedelta64_dtype(df_notdict[col]):
-            df[col] = df_notdict[col].astype(str)
-
-
-    # if data exists, return it is JSON
-    if df is not None:
-        return jsonify({
-            'space_location_id' : df['space_location_id'][0],
-            'ra' : df['ra'][0],
-            'de' : df['de'][0],
-            'description' : df['description'][0]
-        })
+    data = data.fetchall()
+    if data is not None:
+        for row in data:
+            space_location_details = {
+                'space_location_id': row[0],
+                'ra': str(row[1]),
+                'de': row[2],
+                'description': row[3]
+            } 
+        return jsonify({'space_location_details': space_location_details})
     else:
-        return jsonify({'message' : f'Failed to find space location {id}.'}), 404
+        cnx_conn.close()
+        return jsonify({'message': f'Failed to find space location {id}'}), 404
 
 @app.route('/space_locations/add', methods=['POST'])
 def add_space_location():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'message' : 'No data provided.'}), 400
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
     
-    id = data.get('space_location_id')
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    space_location_id = data.get('space_location_id')
     ra = data.get('ra')
     de = data.get('de')
-    desc = data.get('description')
+    description = data.get('description')
 
-    df = pd.DataFrame({
-        'space_location_id' : [id],
-        'ra' : [ra],
-        'de'  : [de],
-        'description' : [desc]
-    })
-    
-    if not id or not ra or not de:
+    # Check for required fields
+    if not all([space_location_id, ra, de]):
         return jsonify({'message': 'Missing required fields.'}), 400
-    
-    # db connection
-    cnx = db_connection()
 
-    # Insert the new space location into the database
-    try:
-        df.to_sql('space_locations', con=cnx, if_exists='append', index=False)
-        return jsonify({'message': 'Space location added successfully.'}), 201
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to add space location.'}), 500
-
-@app.route('/space_locations/remove/<int:id>', methods=['DELETE'])
-def remove_space_location(id):
-    # db connection
     cnx = db_connection()
     cnx_conn = cnx.connect()
 
     try:
-        # Check if the space location exists
-        sql = f"select space_location_id from space_locations where space_location_id={id}"
-        space_loc = pd.read_sql(sql, cnx)
-    except Exception as e:
-        message = str(e)
-        print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
-        return jsonify({'message': 'Failed to check space location existence.'}), 500
-    
-    if not space_loc.empty:
-        try:
-            # Remove space location
-            sql = f"delete from space_locations where space_location_id={id}"
-            cnx_conn.execute(text(sql))
+        sql_check = f"select space_location_id from space_locations where space_location_id = {space_location_id}"
+        space_loc = pd.read_sql(sql_check, cnx)
+
+        if space_loc.empty:
+            df = pd.DataFrame({
+                'space_location_id': [space_location_id],
+                'ra': [ra],
+                'de': [de],
+                'description': [description]
+            })
+
+            df.to_sql('space_locations', con=cnx, if_exists='append', index=False)
             cnx_conn.commit()
             cnx_conn.close()
-            return jsonify({'message': f'Successfully removed space location {id}'}), 200
-        except Exception as e:
-            message = str(e)
-            print(f"An error occurred during second try:\n\n{message}\n\nIgnoring and moving on.")
-            return jsonify({'message': 'Failed to remove space location.'}), 500
-    else:
-        return jsonify({'message': f'Space location {id} not found.'}), 404
+
+            return jsonify({'message': 'Space location added successfully.', 'space_location_details': {
+                'space_location_id': space_location_id,
+                'ra': str(ra),
+                'de': de,
+                'description': description
+            }}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({"message": f"Space location of id {space_location_id} already exists."}), 400
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to add space location.', 'error': message}), 500
+
+@app.route('/space_locations/remove/<int:id>', methods=['DELETE'])
+def remove_space_location(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    try:
+        sql_check = f"select space_location_id from space_locations where space_location_id = {id}"
+        space_loc = pd.read_sql(sql_check, cnx)
+
+        if not space_loc.empty:
+            sql_delete = f"delete from space_locations where space_location_id = {id}"
+            cnx_conn.execute(text(sql_delete))
+            cnx_conn.commit()
+            cnx_conn.close()
+
+            return jsonify({'message': f"Successfully removed space location {id}."}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Space location {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to remove space location.', 'error': message}), 500
+
+@app.route('/space_locations/edit/<int:id>', methods=['POST'])
+def update_space_location(id):
+    if not authorization():
+        return jsonify({'message' : 'Access denied, must provide token.'}), 401
+    
+    cnx = db_connection()
+    cnx_conn = cnx.connect()
+
+    data = request.get_json()
+    if not data:
+        return jsonify({'message': 'No data provided.'}), 400
+
+    attributes = data.get('attribute')
+    values = data.get('value')
+
+    # Check for required fields
+    if not attributes or not values or len(attributes) != len(values):
+        return jsonify({'message': 'Invalid attributes or values.'}), 400
+
+    try:
+        sql_check = f"select space_location_id from space_locations where space_location_id = {id}"
+        obj = pd.read_sql(sql_check, cnx)
+
+        if not obj.empty:
+            sql_update = "update space_locations set "
+            set_values = []
+            for att, val in zip(attributes, values):
+                if att.lower() == 'space_location_id':
+                    return jsonify({"message": 'Primary keys cannot be changed.'}), 400
+                else:
+                    set_values.append(f"{att} = '{val}'")
+
+            sql_update += ", ".join(set_values)
+            sql_update += f" where space_location_id = {id}"
+
+            cnx_conn.execute(text(sql_update))
+            cnx_conn.commit()
+
+            info = pd.read_sql(f"select * from space_locations where space_location_id = {id}", cnx)
+            cnx_conn.close()
+            updated = info.to_dict(orient='records')[0]
+            updated['ra'] = str(updated['ra'])
+
+            return jsonify({'message': 'Space location updated successfully.', 'location_details': updated}), 200
+        else:
+            cnx_conn.close()
+            return jsonify({'message': f'Space location {id} not found.'}), 404
+
+    except Exception as e:
+        message = str(e)
+        return jsonify({'message': 'Failed to update space location.', 'error': message}), 500
 
 
 if __name__ == "__main__":
