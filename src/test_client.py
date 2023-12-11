@@ -318,6 +318,7 @@ def update_space_location(id, attribute, value):
 
 # print output
 if __name__ == '__main__':
+    """
     get_observers()
     print()
     add_observer(16, first_name='Butterscotch', last_name='The Cat')
@@ -341,10 +342,10 @@ if __name__ == '__main__':
     print()
     remove_event(16)
     print()
-    
+    """
     get_objects()
     print()
-    add_object(16, event_name='Supermassive black hole', type='star', desc='Largest type of black hole - a collapsed star much bigger than the Sun.')
+    add_object(16, 'Supermassive black hole', 'star',  'Largest type of black hole - a collapsed star much bigger than the Sun.')
     print()
     get_object(16)
     print()
