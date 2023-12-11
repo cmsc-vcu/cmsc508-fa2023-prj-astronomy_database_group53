@@ -87,21 +87,21 @@ create table earth_locations (
     latitude float not null,
     longitude float not null,
     timezone varchar(255) not null,
-    local_time datetime not null,
-    description varchar(4096)
+    local_time time not null,
+    location_name varchar(4096)
 
 );
 
-INSERT INTO earth_locations (earth_location_id, quadrant, latitude, longitude, timezone, local_time, description) VALUES
-    (1, 'NW', 40.7128, -74.0060, 'UTC-4', '2023-10-15 16:00:00', 'New York City, USA'),
-    (2, 'SW', 34.0522, -118.2437, 'UTC-7', '2023-10-15 13:00:00', 'Los Angeles, USA'),
-    (3, 'NE', 51.5074, -0.1278, 'UTC+0', '2023-10-15 20:00:00', 'London, UK'),
-    (4, 'SE', 33.4484, -112.0740, 'UTC-7', '2023-10-15 13:00:00', 'Phoenix, USA'),
-    (5, 'NW', 41.8781, -87.6298, 'UTC-5', '2023-10-15 15:00:00', 'Chicago, USA'),
-    (6, 'SE', -23.5505, -46.6333, 'UTC-3', '2023-10-15 14:00:00', 'Sao Paulo, Brazil'),
-    (7, 'NE', 55.7558, 37.6176, 'UTC+3', '2023-10-15 21:00:00', 'Moscow, Russia'),
-    (8, 'SW', -33.8688, 151.2093, 'UTC+11', '2023-10-16 01:00:00', 'Sydney, Australia'),
-    (9, 'NW', 48.8566, 2.3522, 'UTC+1', '2023-10-15 17:00:00', 'Paris, France');
+INSERT INTO earth_locations (earth_location_id, quadrant, latitude, longitude, timezone, local_time, location_name) VALUES
+    (1, 'NW', 40.7128, -74.0060, 'UTC-4', '16:00:00', 'New York City, USA'),
+    (2, 'SW', 34.0522, -118.2437, 'UTC-7', '13:00:00', 'Los Angeles, USA'),
+    (3, 'NE', 51.5074, -0.1278, 'UTC+0', '20:00:00', 'London, UK'),
+    (4, 'SE', 33.4484, -112.0740, 'UTC-7', '13:00:00', 'Phoenix, USA'),
+    (5, 'NW', 41.8781, -87.6298, 'UTC-5', '15:00:00', 'Chicago, USA'),
+    (6, 'SE', -23.5505, -46.6333, 'UTC-3', '14:00:00', 'Sao Paulo, Brazil'),
+    (7, 'NE', 55.7558, 37.6176, 'UTC+3', '21:00:00', 'Moscow, Russia'),
+    (8, 'SW', -33.8688, 151.2093, 'UTC+11', '01:00:00', 'Sydney, Australia'),
+    (9, 'NW', 48.8566, 2.3522, 'UTC+1', '17:00:00', 'Paris, France');
     
 create table space_locations (
     space_location_id int not null primary key,
@@ -215,73 +215,74 @@ VALUES
     (3, 3, '2024-03-05'), -- comet Sighting Miami
     (4, 4, '2024-06-12'), -- supernova Observation Los Angeles
     (5, 5, '2024-08-30'), -- planetary conj philly
+    (3, 5, '2025-10-20'),
     (7, 9, '2024-07-25'); -- super blue moon paris
 
 
-INSERT INTO object_location (object_id, location_id)
+INSERT INTO object_location (object_id, location_id, date_occurred)
 VALUES
-    (1, 5),
-    (2, 1),
-    (3, 6),
-    (4, 4),
-    (5, 2),
-    (6, 3),
-    (7, 9),
-    (8, 8),
-    (9, 7),
-    (10, 5),
-    (11, 2);
+    (1, 5,'2023-10-20' ),
+    (2, 1, '2023-11-15'),
+    (3, 6, '2024-03-05'),
+    (4, 4, '2024-03-05'),
+    (5, 2, '2024-08-30'),
+    (9, 2, '2024-09-30'),
+    (1, 2, '2024-08-30'),
+    (6, 3, '2023-12-01'),
+    (7, 9, '2023-12-14'),
+    (8, 8, '2024-04-20'),
+    (9, 7, '2024-03-05');
 
-INSERT INTO object_space_location (object_id, space_location_id)
+INSERT INTO object_space_location (object_id, space_location_id, date_occurred)
 VALUES
-    (1, 1),   -- Andromeda Galaxy - Constellation Andromeda
-    (2, 4),   -- Orion is in Orion
-    (3, 6),   -- Jupiter - Center of the Milky Way - Constellation Aquarius
-    (4, 2),   -- pleidas star cluster - taurus
-    (5, 3),   -- sun -- center 
-    (6, 4),   -- horse nebula is in orion
-    (7, 1),   -- andromeda 2 - andromeda
-    (8, 7),   -- saturn - Constellation capricornus
-    (9, 2), -- crab nebula - taurus
-    (10, 6), -- ganymede -- 
-    (11, 5); -- our moon -- virgo as of right now 12/9/2023
+    (1, 1, '2023-10-20'),  -- total lunar eclipse - Andromeda Galaxy - Constellation Andromeda
+    (2, 4, '2023-11-15'),  -- meteor shower - Orion is in Orion
+    (3, 6, '2024-03-05'),  -- comet sighting - Jupiter - Center of the Milky Way - Constellation Aquarius
+    (4, 2, '2024-06-12'),  -- supernova observation - Pleiades Star Cluster - Taurus
+    (5, 3, '2024-08-30'),  -- planetary conjunction - Sun - Center
+    (6, 4, '2023-12-01'),  -- total solar eclipse - Horse Nebula is in Orion
+    (7, 1, '2023-12-14'),  -- super blue moon - Andromeda 2 - Andromeda
+    (8, 7, '2024-04-20'),  -- hypernova observation - Saturn - Constellation Capricornus
+    (9, 2, '2024-07-25'),  -- bright comet sighting - Crab Nebula - Taurus
+    (10, 6, '2022-09-23'),  -- ganymede
+    (11, 5, '2023-12-09');  -- our moon - Virgo (as of 12/9/2023)
 
-INSERT INTO observer_event (observer_id, event_id)
+INSERT INTO observer_event (observer_id, event_id, date_occurred)
 VALUES
-    (1, 1),
-    (2, 2),
-    (3, 3),
-    (4, 4),
-    (5, 5),
-    (6, 6),
-    (7, 7),
-    (8, 8),
-    (9, 9),
-    (10, 5),
-    (11, 1),
-    (12, 3),
-    (13, 7),
-    (14, 8),
-    (15, 9);
+    (1, 1, '2023-10-20'),
+    (2, 2, '2023-11-15'),
+    (3, 3, '2024-03-05'),
+    (4, 4, '2024-06-12'),
+    (5, 5, '2024-08-30'),
+    (6, 6, '2023-12-01'),
+    (7, 7, '2023-12-14'),
+    (8, 8, '2024-04-20'),
+    (9, 9, '2024-07-25'),
+    (10, 5, '2024-08-30'),
+    (11, 1, '2023-10-20'),
+    (12, 3, '2024-03-05'),
+    (13, 7, '2023-12-14'),
+    (14, 8, '2024-04-20'),
+    (15, 9, '2024-07-25');
 
 
-INSERT INTO observer_object (observer_id, object_id)
+INSERT INTO observer_object (observer_id, object_id, date_occurred)
 VALUES
-    (1, 3),
-    (2, 4),
-    (3, 2),
-    (4, 1),
-    (5, 10),
-    (6, 9),
-    (7, 7),
-    (8, 6),
-    (9, 8),
-    (10, 1),
-    (11, 4),
-    (12, 5),
-    (13, 2),
-    (14, 3),
-    (15, 11);
+    (1, 3, '2024-03-05'),
+    (2, 4, '2024-06-12'),
+    (3, 2, '2023-11-15'),
+    (4, 1, '2023-10-20'),
+    (5, 10, '2020-10-24'),
+    (6, 9, '2024-07-25'),
+    (7, 7, '2023-12-14'),
+    (8, 6, '2023-12-01'),
+    (9, 8, '2024-04-20'),
+    (10, 1, '2023-10-20'),
+    (11, 4, '2024-06-12'),
+    (12, 5, '2024-08-30'),
+    (13, 2, '2023-11-15'),
+    (14, 3, '2024-03-05'),
+    (15, 11, '2022-01-10');
 
 INSERT INTO object_object (object1_id, object2_id)
 VALUES
