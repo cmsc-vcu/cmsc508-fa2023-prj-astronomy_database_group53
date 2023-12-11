@@ -6,14 +6,13 @@ authors: 🌟 Uma Manicka & Celeste Olmstead 🌟
 format:
     html:
         theme: cyborg
-        toc: false
+        toc: true
         embed-resources: true
+        code-copy: true
         linkcolor: pink
 ---
 
-(I copy and pasted the first project overview so we can edit it and update whatever we've done since then)
-
-#### 🪐Project Overview🪐 
+# 🪐Project Overview🪐 
 
 
 See:
@@ -23,7 +22,7 @@ See:
 * [DESIGN VIDEO](https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j)
 
 
-#### Problem Description
+### Problem Description
 
 <span style="color:#a074c1;">Problem Domain</span>
 
@@ -59,7 +58,7 @@ See:
 : User Authentication
 * We do not plan on having a user authentication as our database will not store user's data or information. It will be purely for querying.
 
-#### Database Design
+### Database Design
 
 <span style="color:#a074c1;">Design Tradeoffs</span>
 
@@ -83,22 +82,20 @@ erDiagram
 ```
 
 
-Celestial Objects and Events
+<span style="color:#a074c1;">Celestial Objects and Events</span>
 
 * Our idea is that celestial objects can cause events, although events don't always have to be directly caused by a celestial object or may have a cause we are unsure of. Many objects can cause an event, but some do not. 
 
-
-Location
+<span style="color:#a074c1;">Location</span>
 
 * Both events and ojects have locations that they can be seen from Earth. Events and objects can be seen sometimes only in certain hemispheres or regions (like Aurora Borealis). This allows the user to query the database with questions like: What location has the most meteor showers? This requires splitting the Earth into certain zones, so, when coordinates are inputted, they are classified into a certain zone.
 
-
-Observers
+<span style="color:#a074c1;">Observers</span>
 
 * We also plan to add observers, where an event or object can have multiple, but an observer must discover at least one to be in the database. This way, users can query with questions like: When was the last discovery about Jupiter made? This would also require celestial objects to have other objects linked to them, such as Earth is linked to the moon.
 
 
-<span style="color:#a074c1;">**Our Tables - BCNF Showcase**</span>
+### Our Tables - BCNF Showcase
 
 * (you can tab through them)
 * All these tables are in BCNF because their candidate keys determine all other attributes, and there are no partial dependencies.
@@ -290,7 +287,7 @@ df
 
 :::
 
-<span style="color:#a074c1;">**Our Associative Tables**</span>
+### Our Associative Tables
 
 ::: {.panel-tabset}
 ## Object-Event
@@ -450,112 +447,643 @@ df
 
 ::: 
 
-<span style="color:#a074c1;">**Queries**</span>
+### Queries
 
 ::: {.panel-tabset}
 
 ## 1
-1. **Retrieve names and descriptions of celestial objects visible from a specific location.**
+1. **Retrieve names and descriptions of objects visible from a specific location.**
 
-   * $\pi_{object\_name, description}(\sigma_{location\_id = X}(CelestialObject-Location))$
+   * $\pi_{object\_name, description}(\sigma_{location\_id = X}(Object-Location))$
+
+```{python}
+sql = f"""
+     SELECT 
+        object_name,
+        b.location_name
+    FROM
+        object_location a
+        INNER JOIN objects b on (a.object_id = b.object_id)
+        INNER JOIN earth_locations c on (a.location_id = c.earth_location_id)
+    WHERE location_id = 2
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 2
-2. **Find upcoming celestial events for a given location.**
+2. **Find upcoming events for a given location.**
 
    * $\pi_{event\_name, date}(\sigma_{location\_id = X}(Event-Location))$
 
-## 3
-3. **Identify celestial objects discovered by a specific observer.**
+```{python}
+sql = f"""
+    SELECT 
+     b.event_name, 
+     a.date_occurred
+    FROM 
+     event_location a
+    JOIN events b ON a.event_id = b.event_id
+    WHERE a.location_id = 5 AND a.date_occurred > CURDATE()
+    ;
+"""
+```
 
-   * $\pi_{object\_name}(\sigma_{observer\_id = X}(Observer-CelestialObject))$
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
+
+## 3
+3. **Identify objects discovered by a specific observer.**
+
+   * $\pi_{object\_name, first\_name,last\_name}(\sigma_{observer\_id = X}(Observer-Object))$
+```{python}
+sql = f"""
+    SELECT 
+     c.first_name,
+     c.last_name,
+     b.object_name
+    FROM 
+     observer_object a
+    INNER JOIN objects b ON a.object_id = b.object_id
+    INNER JOIN observers c on a.observer_id = c.observer_id
+    WHERE a.observer_id = 8
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 4
-4. **List all celestial events related to a specific celestial object.**
+4. **List all events related to a specific object.**
 
-   * $\pi_{event\_name}(\sigma_{object\_id = X}(CelestialObject-Event))$
+   * $\pi_{event\_name}(\sigma_{object\_id = X}(Object-Event))$
+
+```{python}
+sql = f"""
+    SELECT 
+        b.event_name
+    FROM
+        object_event a
+        INNER JOIN events b ON (a.event_id = b.event_id)
+    WHERE a.object_id = 5;
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 5
-5. **Find the celestial objects with specific characteristics (e.g., galaxies, stars).**
+5. **Find the objects with specific characteristics (e.g., galaxies, stars).**
 
-   * $\pi_{object\_name}(\sigma_{object\_type = "Galaxy" \land X)}(CelestialObject)$
+   * $\pi_{object\_name}(\sigma_{object\_type = "galaxy" \land "planet")}(Object)$
+```{python}
+sql = f"""
+    SELECT 
+        b.object_name
+    FROM
+        objects b
+    WHERE b.type = 'galaxy' OR b.type = 'planet'
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 6
-6. **Retrieve the celestial objects observed from a given quadrant.**
+6. **Retrieve the objects observed from a given quadrant.**
 
-   * $\pi_{object\_name}(\sigma_{quadrant = "NW"}(EarthLocation \Join CelestialObject-Location \Join CelestialObject))$
+   * $\pi_{object\_name}(\sigma_{quadrant = "NW"}(EarthLocation \Join Object-Location \Join Object))$
+```{python}
+sql = f"""
+    SELECT 
+        c.object_name
+    FROM
+        earth_locations a
+        INNER JOIN object_location b ON (a.earth_location_id = b.location_id)
+        INNER JOIN objects c ON (b.object_id = c.object_id)
+    WHERE a.quadrant = 'NW';
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 7
 7. **Find events on a specific date.**
 
    * $\pi_{event\_name}(\sigma_{date = "YYYY-MM-DD"}(Event))$
+```{python}
+sql = f"""
+    SELECT 
+        e.event_name
+    FROM
+        events e
+    WHERE e.date_occurred = '2024-04-20';
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 8
-8. **Get details about celestial locations.**
+8. **Get details about space locations.**
 
-   * $\pi_{RA, Dec}(\sigma_{cel\_location\_id = X}(CelestialLocation))$
+   * $\pi_{ra, de}(\sigma_{space\_location\_id = X}(SpaceLocation))$
+```{python}
+sql = f"""
+    SELECT 
+        a.description,
+        a.ra,
+        a.de
+    FROM
+        space_locations a
+    WHERE a.space_location_id = 1 OR a.space_location_id = 2 OR a.space_location_id = 7;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 9
-9. **List celestial objects linked to other celestial objects.**
+9. **List objects linked to other objects.**
 
-   * $\pi_{object\_name}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$
+   * $\pi_{object\_name}(\sigma_{related\_object\_id = X}(Object-Object))$
+
+```{python}
+sql = f"""
+    SELECT 
+        b.object_name
+    FROM
+        object_object a
+        INNER JOIN objects b ON (a.object2_id = b.object_id)
+    WHERE a.object1_id = 3;
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 10
-10. **Find the observers who discovered a specific celestial object.**
+10. **Find the observers who discovered a specific object.**
 
-    * $\pi_{first\_name, last_name}(\sigma_{object\_id = X}(Observer-CelestialObject))$
+    * $\pi_{first\_name, last_name}(\sigma_{object\_id = X}(Observer-Object))$
+```{python}
+sql = f"""
+   SELECT 
+        d.first_name,
+        d.last_name
+    FROM
+        observer_object a
+        INNER JOIN observers d ON (a.observer_id = d.observer_id)
+    WHERE a.object_id = 3;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 11
-11. **Plan a stargazing session by retrieving the celestial objects visible from a specific location and their altitudes.**
+11. **Plan a stargazing session by retrieving the objects visible from a specific location.**
 
-    * $\pi_{object\_name, altitude}(\sigma_{location\_id = X}(CelestialObject-Location \Join CelestialLocation))$
+    * $\pi_{object\_name}(\sigma_{space\_location\_id = X}(Object-Location \Join SpaceLocation))$
+```{python}
+sql = f"""
+   SELECT 
+        c.object_name
+    FROM
+        object_location a
+        INNER JOIN objects c ON (a.object_id = c.object_id)
+    WHERE a.location_id = 2;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 12
-12. **Identify the best time to observe a particular celestial event, considering the location's time zone (UTC).**
+12. **Identify the best area to observe a particular celestial event, considering location's time zone (UTC).**
 
-    * $\pi_{event\_name, date}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))$
+    * $\pi_{event\_name, date, description, local\_time}(\sigma_{event\_id = X}(Event-Location \Join EarthLocation))$
+```{python}
+sql = f"""
+    SELECT 
+        b.event_name,
+        b.date_occurred,
+        c.location_name,
+        c.local_time
+    FROM
+        event_location a
+        INNER JOIN events b ON (a.event_id = b.event_id)
+        INNER JOIN earth_locations c ON (a.location_id = c.earth_location_id)
+    WHERE a.event_id = 2 AND c.local_time > '07:00:00' AND c.local_time < '23:00:00'  ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 13
 13. **Explore details about the celestial objects discovered by a specific observer, including their descriptions.**
 
-    * $\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-CelestialObject \Join CelestialObject))$
+    * $\pi_{object\_name, description}(\sigma_{observer\_id = X}(Observer-Object \Join Object))$
+```{python}
+sql = f"""
+    SELECT 
+        d.first_name,
+        d.last_name,
+        b.object_name,
+        b.type,
+        b.description
+    FROM
+        observer_object a
+        INNER JOIN observers d ON (a.observer_id = d.observer_id)
+        INNER JOIN objects b ON (a.object_id = b.object_id)
+    WHERE a.observer_id = 3;
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 14
 14. **Find information about upcoming meteor showers, specifically where and when they can be observed.**
 
     * $\pi_{event\_name, date}(\sigma_{event\_name = "Meteor Shower"}(Event-Location))$
+```{python}
+sql = f"""
+    SELECT 
+        b.event_name,
+        c.location_name,
+        b.date_occurred,
+        c.local_time
+    FROM
+        events b
+        INNER JOIN event_location a ON (b.event_id = a.event_id)
+        INNER JOIN earth_locations c ON (a.location_id = c.earth_location_id)
+    WHERE b.event_name = 'meteor shower'
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 15
 15. **Locate celestial objects of a particular type (e.g., planets) visible from a specific quadrant.**
 
-    * $\pi_{object\_name}(\sigma_{object\_type = "Planet" \land quadrant = "NW"}(CelestialObject \Join CelestialObject-Location \Join EarthLocation))$
+    * $\pi_{object\_name}(\sigma_{object\_type = "Planet" \land quadrant = "NW"}(Object \Join Object-Location \Join EarthLocation))$
+```{python}
+sql = f"""
+     SELECT 
+        c.object_name
+    FROM
+        earth_locations a
+        INNER JOIN object_location b ON (a.earth_location_id = b.location_id)
+        INNER JOIN objects c ON (b.object_id = c.object_id)
+    WHERE c.type = 'planet' AND a.quadrant = 'SW'
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 16
-16. **Discover the celestial events scheduled for a specific date and their locations.**
+16. **Discover the events scheduled for a specific date and their locations.**
 
-    * $\pi_{event\_name, location\_id}(\sigma_{date = "YYYY-MM-DD"}(Event-Location))$
+    * $\pi_{event\_name, location\_name}(\sigma_{date = "YYYY-MM-DD"}(Event-Location))$
+```{python}
+sql = f"""
+   SELECT 
+        b.event_name,
+        c.location_name
+    FROM
+        event_location a
+        INNER JOIN events b ON (a.event_id = b.event_id)
+        INNER JOIN earth_locations c ON (a.location_id = c.earth_location_id)
+    WHERE a.date_occurred = '2023-10-20';
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 17
-17. **Determine the celestial objects with the highest altitudes at a given time.**
+17. **Determine the celestial objects with the highest ra**
 
-    * $\pi_{object\_name, altitude}(\sigma_{date = "YYYY-MM-DD"}(CelestialObject-Location \Join CelestialLocation))$
+    * $\pi_{object\_name, ra}(\sigma_{date = "YYYY-MM-DD"}(Object-Location \Join SpaceLocation))$
+```{python}
+sql = f"""
+    SELECT 
+        c.object_name,
+        b.ra
+    FROM
+        object_location a
+        INNER JOIN objects c ON (a.object_id = c.object_id)
+        INNER JOIN space_locations b ON (a.location_id = b.space_location_id)
+    WHERE a.date_occurred = '2024-03-05'
+    ORDER BY b.ra DESC
+    LIMIT 1
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 18
-18. **Explore details about a specific celestial location, such as RA and Dec.**
+18. **Explore details about a specific space location, such as RA and Dec.**
 
-    * $\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join CelestialObject-Location \Join CelestialLocation))$
+    * $\pi_{RA, Dec}(\sigma_{location\_id = X}(EarthLocation \Join Object-Location \Join SpaceLocation))$
+```{python}
+sql = f"""
+    SELECT
+        b.description, 
+        b.ra,
+        b.de
+    FROM
+        earth_locations a
+        INNER JOIN object_location c ON (a.earth_location_id = c.location_id)
+        INNER JOIN space_locations b ON (c.location_id = b.space_location_id)
+    WHERE a.earth_location_id = 2
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 19
 19. **Find celestial events with unique characteristics (e.g., total solar eclipses) and their dates.**
 
     * $\pi_{event\_name, date}(\sigma_{event\_name = "Total Solar Eclipse"}(Event-Location))$
+```{python}
+sql = f"""
+    SELECT 
+        c.event_name,
+        b.date_occurred
+    FROM
+        events c
+        INNER JOIN event_location b ON(c.event_id = b.event_id)
+        INNER JOIN earth_locations a ON (b.location_id = a.earth_location_id)
+    WHERE c.event_name = 'super blue moon';
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
 
 ## 20
 20. **Discover celestial objects with unusual relationships (e.g., moons of specific planets).**
 
-    * $\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(CelestialObject-CelestialObject))$
+    * $\pi_{object\_name, related\_object\_id}(\sigma_{related\_object\_id = X}(Object-Object))$
+```{python}
+sql = f"""
+    SELECT 
+        a.object_name,
+        b.object2_id
+    FROM
+        objects a
+        INNER JOIN object_object b ON a.object_id = b.object1_id
+    WHERE b.object2_id = 8
+    ;
+"""
+```
+
+```{python}
+#| echo: false
+#| eval: true
+try:
+    df = pd.read_sql(sql,cnx)
+    df
+except Exception as e:
+    message = str(e)
+    print(f"An error occurred:\n\n{message}\n\nIgnoring and moving on.")
+    df = pd.DataFrame()
+df
+
+```
+
 :::
 
-#### Project Management
+### Project Management
 
 ``` {mermaid}
 %%{init: {'theme':'dark'}}%%
@@ -578,14 +1106,14 @@ gantt
 
 ### Reflection
 
-**Astronomy Engine**
+<span style="color:#a074c1;">**Astronomy Engine**</span>
 
 * Using Astronomy Engine, we will be able to turn any location given in longitude and latitude into both Equatorial coordinates and Altitude Azimuth coordinates, as these will help provide the user with instructions to view celestial objects and events. However, we did not allocate enough time to implement this additional feature to our project. This is something we could look into implementing as our own side project.
 
-**Accurate Astronomy Database**
+<span style="color:#a074c1;">**Accurate Data**</span>
 
 * Our data individually is all realistic other, however, the relations are not necessarily accurate. We just went table by table to find data. To research the links between each item is much more time intensive. For example, we did not look to see whether y planet can be from x space location and which earth location it can be.
 
-**User Input**
+<span style="color:#a074c1;">**User Input**</span>
 
 * 
