@@ -10,6 +10,14 @@ Included are the following files:
 | *./reports* | contains deliverable reports 4 through 7 |
 
 
+* src
+--> astronomy.py contains the api
+--> flask -A astronomy.py run  
+
+--> test_client.py offers some functions for easy api access
+
+--> db-ddl.sql is the ddl for our database
+
 ## Team  Members
 
 * Uma Manicka
@@ -25,3 +33,5 @@ Included are the following files:
 [Design Document](https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j) - Deliverable 4
 
 [Design Video](reports/projectOverview.html) - Deliverable 4
+
+[Complete Video](https://clipchamp.com/watch/PZGXEWYhwr1) - Last Deliverable

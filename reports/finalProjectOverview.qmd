@@ -20,6 +20,7 @@ See:
 * [GITHUB REPO](https://github.com/cmsc-vcu/cmsc508-fa2023-prj-astronomy_database_group53)
 * [PITCH VIDEO](https://clipchamp.com/watch/5yb3Z2ORm1g?utm_source=share&utm_medium=social&utm_campaign=watch)
 * [DESIGN VIDEO](https://vcu.mediaspace.kaltura.com/media/video1242889568/1_u95qqk0j)
+* [FINAL VIDEO](https://clipchamp.com/watch/PZGXEWYhwr1)
 
 
 ### Problem Description
@@ -49,15 +50,11 @@ See:
 
 <span style="color:#a074c1;">Security and Privacy</span>
 
-: Access Controls
+**Access Controls**
 
 * Unauthorized users should not be able to access or manipulate the database.
 
-: Data Encryption
-
-* Data transmitted over the network, especially sensitive user information such as a user's query (in case it has their location), should not be accessible by other users.
-
-: User Authentication
+**User Authentication**
 
 * We do not have a user authentication as our database will not store user's data or information. It will be purely for querying. However, we have an access security mechanism for our API.
 
@@ -1176,7 +1173,7 @@ i) Password:
 header = {'Authorization' :'Bearer super-secret'}
 ```
 
-* To run astronomy_api.py: 
+* To run astronomy.py: 
 i) flask -A astronomy_api.py run 
 ## How to Use
 
@@ -1276,7 +1273,7 @@ else:
 ```
 
 ## remove
-**Now Let's Remove Uranus
+**Now Let's Remove Uranus**
 ```{python}
 rm_data = {"object_id" : 12}
 response = requests.delete(f'http://localhost:5000/objects/remove/12', json=rm_data, headers=header)
