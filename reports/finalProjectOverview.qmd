@@ -1338,6 +1338,29 @@ else:
 ```
 
 :::
+
+### Project Management
+
+``` {mermaid}
+%%{init: {'theme':'dark'}}%%
+gantt
+    title Semester Project Timeline
+    dateFormat YYYY-MM-DD
+    Deliverable 4 Due : milestone, m1, 2023-10-15, 0d
+    Deliverable 5 Due : milestone, m1, 2023-11-03, 0d
+    Deliverable 6 Due : milestone, m1, 2023-11-17, 0d
+    Semester Project Due : milestone, m1, 2023-12-12, 0d
+    section Tasks
+        Database Development :a1, 2023-10-15, 12d
+        Status Report :a2, 2023-10-27, 7d
+        API Development :after a2, 14d
+        Status Report :a3, 2023-11-10, 7d
+        Finishing Touches :a4, 2023-11-27, 15d
+        Final Report :2023-12-05, 7d
+
+        
+```
+
 ### Reflection
 
 <span style="color:#a074c1;">**Astronomy Engine**</span>
