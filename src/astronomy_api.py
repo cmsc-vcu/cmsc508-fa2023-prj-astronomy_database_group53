@@ -1183,6 +1183,5 @@ def update_space_location(id):
         message = str(e)
         return jsonify({'message': 'Failed to update space location.', 'error': message}), 500
 
-
 if __name__ == "__main__":
     app.run(host='cmsc508.com', port=5000)
