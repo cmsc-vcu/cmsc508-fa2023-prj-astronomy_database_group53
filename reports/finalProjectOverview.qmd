@@ -1098,7 +1098,7 @@ df
 
 ## Astronomy API
 * Our API was made in the astronomy.py file using flask
-* Our client.py defines functions to easily utilize our endpoints for basic tasks involving the API
+* Our test_client.py defines functions to easily utilize our endpoints for basic tasks involving the API
 
 ##### Endpoints
 
